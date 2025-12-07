@@ -80,6 +80,13 @@ namespace WinXCornersDotNet
                 
                 if (nCode >= 0 && wParam == (IntPtr)NativeMethods.WM_LBUTTONDBLCLK)
                 {
+                    // VISIBLE TEST: Show message box to prove callback is triggered
+                    System.Windows.Forms.MessageBox.Show(
+                        "Double-click detected by hook!", 
+                        "Debug - Hook Working",
+                        System.Windows.Forms.MessageBoxButtons.OK,
+                        System.Windows.Forms.MessageBoxIcon.Information);
+                    
                     System.Diagnostics.Debug.WriteLine("Double-click detected!");
                     
                     var hookStruct = Marshal.PtrToStructure<NativeMethods.MSLLHOOKSTRUCT>(lParam);
