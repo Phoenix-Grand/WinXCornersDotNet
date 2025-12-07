@@ -111,6 +111,11 @@ namespace WinXCornersDotNet
         public static extern bool GetCursorPos(out POINT lpPoint);
 
         [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool ScreenToClient(IntPtr hWnd, ref POINT lpPoint);
+
+
+        [DllImport("user32.dll")]
         private static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]

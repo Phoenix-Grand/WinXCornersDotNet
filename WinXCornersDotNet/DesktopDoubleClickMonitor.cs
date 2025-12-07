@@ -85,11 +85,16 @@ namespace WinXCornersDotNet
             if (className.ToString() != "SysListView32")
                 return false;
 
+            // Convert screen coordinates to client coordinates for the hit test
+            var clientPoint = point;
+            if (!NativeMethods.ScreenToClient(hWnd, ref clientPoint))
+                return false;
+
             // Now check if the click is on an empty area (not on an icon)
             // We need to do a hit test on the ListView
             var lvHitTest = new NativeMethods.LVHITTESTINFO
             {
-                pt = point,
+                pt = clientPoint,  // Use client coordinates
                 flags = 0,
                 iItem = -1
             };
