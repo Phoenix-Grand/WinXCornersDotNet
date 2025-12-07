@@ -1,0 +1,2 @@
+# WinXCornersDotNet
+refactor of WinXCorner
