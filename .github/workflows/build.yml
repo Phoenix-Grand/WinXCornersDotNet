@@ -5,13 +5,30 @@ on:
     branches: [ "master", "main" ]
   pull_request:
     branches: [ "master", "main" ]
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: "Branch to build (e.g. main, feature/my-branch)"
+        required: false
+        default: "main"
+        type: string
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
+    # Checkout for push/PR (normal behavior)
+    - name: Checkout (push/PR)
     - uses: actions/checkout@v4
+      if: github.event_name != 'workflow_dispatch'
+
+    # Checkout for manual run – allow choosing branch
+    - name: Checkout (manual)
+      if: github.event_name == 'workflow_dispatch'
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.target_branch }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
