@@ -1,8 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using WinXCornersDotNet.Properties;
 
 namespace WinXCornersDotNet
 {
@@ -14,24 +14,20 @@ namespace WinXCornersDotNet
         private ContextMenuStrip _trayMenu = null!;
         private bool _allowClose;
 
-        // ===== Show/Hide desktop icons hotkey =====
-        private const int HOTKEY_ID = 0x1234;
-        private const uint MOD_ALT = 0x0001;
-        private const uint MOD_CONTROL = 0x0002;
-        private const int VK_D = 0x44;
-        private const int WM_HOTKEY = 0x0312;
+        // Tray icon variants + state for desktop icons
+        private Icon _trayIconDesktopVisible = null!;
+        private Icon _trayIconDesktopHidden = null!;
+        private bool _desktopIconsHidden;
 
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        // Global hotkey ID for Ctrl+Alt+D
+        private const int HOTKEY_ID = 1;
 
         public MainForm()
         {
             InitializeComponent();
 
             _settings = SettingsService.Load();
+
             InitializeTrayIcon();
             PopulateActionCombos();
             ApplySettingsToUi();
@@ -40,6 +36,14 @@ namespace WinXCornersDotNet
             _hotCornerManager.Start();
 
             FormClosing += MainForm_FormClosing;
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            
+            // Register hotkey after handle is created
+            RegisterGlobalHotkey();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -60,32 +64,87 @@ namespace WinXCornersDotNet
             btnSave.Click += btnSave_Click;
             btnCancel.Click += btnCancel_Click;
 
-            // Register Ctrl+Alt+D for toggling desktop icons
-            bool ok = RegisterHotKey(Handle, HOTKEY_ID, MOD_CONTROL | MOD_ALT, VK_D);
-            if (!ok)
-            {
-                MessageBox.Show(
-                    this,
-                    "Could not register hotkey Ctrl+Alt+D.",
-                    "WinXCorners",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
+            // Wire hotkey change events
+            chkHotkeyEnabled.CheckedChanged += HotkeySettings_Changed;
+            chkHotkeyCtrl.CheckedChanged += HotkeySettings_Changed;
+            chkHotkeyAlt.CheckedChanged += HotkeySettings_Changed;
+            chkHotkeyShift.CheckedChanged += HotkeySettings_Changed;
+            chkHotkeyWin.CheckedChanged += HotkeySettings_Changed;
+            comboHotkeyKey.SelectedIndexChanged += HotkeySettings_Changed;
+
+            PopulateHotkeyKeys();
 
             // Start minimized to tray
             Hide();
             ShowInTaskbar = false;
         }
 
-        protected override void WndProc(ref Message m)
+        private void HotkeySettings_Changed(object? sender, EventArgs e)
         {
-            if (m.Msg == WM_HOTKEY && m.WParam.ToInt32() == HOTKEY_ID)
+            // Enable/disable modifier checkboxes based on hotkey enabled state
+            bool enabled = chkHotkeyEnabled.Checked;
+            chkHotkeyCtrl.Enabled = enabled;
+            chkHotkeyAlt.Enabled = enabled;
+            chkHotkeyShift.Enabled = enabled;
+            chkHotkeyWin.Enabled = enabled;
+            comboHotkeyKey.Enabled = enabled;
+        }
+
+        private void PopulateHotkeyKeys()
+        {
+            var keys = new[]
             {
-                DesktopIcons.Toggle();
-                return;
+                new { Text = "A", Value = (int)Keys.A },
+                new { Text = "B", Value = (int)Keys.B },
+                new { Text = "C", Value = (int)Keys.C },
+                new { Text = "D", Value = (int)Keys.D },
+                new { Text = "E", Value = (int)Keys.E },
+                new { Text = "F", Value = (int)Keys.F },
+                new { Text = "G", Value = (int)Keys.G },
+                new { Text = "H", Value = (int)Keys.H },
+                new { Text = "I", Value = (int)Keys.I },
+                new { Text = "J", Value = (int)Keys.J },
+                new { Text = "K", Value = (int)Keys.K },
+                new { Text = "L", Value = (int)Keys.L },
+                new { Text = "M", Value = (int)Keys.M },
+                new { Text = "N", Value = (int)Keys.N },
+                new { Text = "O", Value = (int)Keys.O },
+                new { Text = "P", Value = (int)Keys.P },
+                new { Text = "Q", Value = (int)Keys.Q },
+                new { Text = "R", Value = (int)Keys.R },
+                new { Text = "S", Value = (int)Keys.S },
+                new { Text = "T", Value = (int)Keys.T },
+                new { Text = "U", Value = (int)Keys.U },
+                new { Text = "V", Value = (int)Keys.V },
+                new { Text = "W", Value = (int)Keys.W },
+                new { Text = "X", Value = (int)Keys.X },
+                new { Text = "Y", Value = (int)Keys.Y },
+                new { Text = "Z", Value = (int)Keys.Z },
+                new { Text = "F1", Value = (int)Keys.F1 },
+                new { Text = "F2", Value = (int)Keys.F2 },
+                new { Text = "F3", Value = (int)Keys.F3 },
+                new { Text = "F4", Value = (int)Keys.F4 },
+                new { Text = "F5", Value = (int)Keys.F5 },
+                new { Text = "F6", Value = (int)Keys.F6 },
+                new { Text = "F7", Value = (int)Keys.F7 },
+                new { Text = "F8", Value = (int)Keys.F8 },
+                new { Text = "F9", Value = (int)Keys.F9 },
+                new { Text = "F10", Value = (int)Keys.F10 },
+                new { Text = "F11", Value = (int)Keys.F11 },
+                new { Text = "F12", Value = (int)Keys.F12 },
+            };
+
+            comboHotkeyKey.DisplayMember = "Text";
+            comboHotkeyKey.ValueMember = "Value";
+            comboHotkeyKey.Items.Clear();
+
+            foreach (var k in keys)
+            {
+                comboHotkeyKey.Items.Add(k);
             }
 
-            base.WndProc(ref m);
+            if (comboHotkeyKey.Items.Count > 0)
+                comboHotkeyKey.SelectedIndex = 0;
         }
 
         private void InitializeTrayIcon()
@@ -106,28 +165,65 @@ namespace WinXCornersDotNet
                 _hotCornerManager.UpdateSettings(_settings);
             };
 
-            var toggleIconsItem = new ToolStripMenuItem(
-                "Toggle desktop icons (Ctrl+Alt+D)",
+            // Toggle desktop icons menu item
+            var toggleDesktopIconsItem = new ToolStripMenuItem(
+                "Toggle desktop icons",
                 null,
-                (_, _) => DesktopIcons.Toggle());
+                (_, _) => ToggleDesktopIconsFromTray());
 
             var exitItem = new ToolStripMenuItem("Exit", null, (_, _) => ExitFromTray());
 
             _trayMenu.Items.Add(settingsItem);
             _trayMenu.Items.Add(new ToolStripSeparator());
             _trayMenu.Items.Add(enabledItem);
-            _trayMenu.Items.Add(toggleIconsItem);
+            _trayMenu.Items.Add(toggleDesktopIconsItem);
             _trayMenu.Items.Add(new ToolStripSeparator());
             _trayMenu.Items.Add(exitItem);
 
+            // Use embedded .ico resources instead of SystemIcons
+            _trayIconDesktopVisible = Resources.desktop_icons_visible;
+            _trayIconDesktopHidden = Resources.desktop_icons_hidden;
+
+            // Detect current desktop icon state on startup
+            _desktopIconsHidden = !NativeMethods.AreDesktopIconsVisible();
+
             _notifyIcon = new NotifyIcon
             {
-                Icon = SystemIcons.Application,
                 Visible = true,
-                ContextMenuStrip = _trayMenu,
-                Text = "WinXCorners"
+                ContextMenuStrip = _trayMenu
             };
+
+            UpdateTrayIconAppearance();
+
             _notifyIcon.DoubleClick += (_, _) => ShowFromTray();
+        }
+
+        private void UpdateTrayIconAppearance()
+        {
+            if (_notifyIcon == null)
+                return;
+
+            _notifyIcon.Icon = _desktopIconsHidden
+                ? _trayIconDesktopHidden
+                : _trayIconDesktopVisible;
+
+            string state = _desktopIconsHidden
+                ? "Desktop icons hidden"
+                : "Desktop icons visible";
+
+            // Tooltip text is limited to 63 chars in the Windows notification area
+            _notifyIcon.Text = $"WinXCorners - {state}";
+        }
+
+        private void ToggleDesktopIconsFromTray()
+        {
+            // Ask Windows to toggle icons
+            NativeMethods.ToggleDesktopIcons();
+
+            // Re-read actual state from Explorer so we stay in sync
+            _desktopIconsHidden = !NativeMethods.AreDesktopIconsVisible();
+
+            UpdateTrayIconAppearance();
         }
 
         private void ShowFromTray()
@@ -139,15 +235,63 @@ namespace WinXCornersDotNet
             Activate();
         }
 
+        private void RegisterGlobalHotkey()
+        {
+            // Don't register if handle not created yet
+            if (!IsHandleCreated)
+                return;
+
+            // Unregister any existing hotkey
+            NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID);
+
+            // Only register if enabled
+            if (!_settings.HotkeyEnabled)
+                return;
+
+            // Build modifier flags
+            uint modifiers = 0;
+            if (_settings.HotkeyCtrl) modifiers |= NativeMethods.MOD_CONTROL;
+            if (_settings.HotkeyAlt) modifiers |= NativeMethods.MOD_ALT;
+            if (_settings.HotkeyShift) modifiers |= NativeMethods.MOD_SHIFT;
+            if (_settings.HotkeyWin) modifiers |= NativeMethods.MOD_WIN;
+
+            // Register Ctrl+Alt+D to toggle desktop icons
+            bool registered = NativeMethods.RegisterHotKey(
+                Handle,
+                HOTKEY_ID,
+                modifiers,
+                (uint)_settings.HotkeyKeyCode);
+
+            if (!registered)
+            {
+                // Log or show warning if registration fails (key already in use)
+                System.Diagnostics.Debug.WriteLine($"Failed to register global hotkey with modifiers {modifiers} and key {_settings.HotkeyKeyCode}");
+            }
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == NativeMethods.WM_HOTKEY && m.WParam.ToInt32() == HOTKEY_ID)
+            {
+                // Ctrl+Alt+D was pressed
+                ToggleDesktopIconsFromTray();
+            }
+
+            base.WndProc(ref m);
+        }
+
         private void ExitFromTray()
         {
             _allowClose = true;
             _hotCornerManager.Stop();
+            
+            // Unregister the global hotkey
+            NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID);
+            
             _notifyIcon.Visible = false;
-
-            // Clean up hotkey
-            UnregisterHotKey(Handle, HOTKEY_ID);
-
+            _notifyIcon.Dispose();
+            _trayIconDesktopVisible?.Dispose();
+            _trayIconDesktopHidden?.Dispose();
             Application.Exit();
         }
 
@@ -182,6 +326,7 @@ namespace WinXCornersDotNet
                 new ComboItem("None", HotCornerActionType.None),
                 new ComboItem("Show all windows (Task View)", HotCornerActionType.ShowAllWindows),
                 new ComboItem("Show desktop", HotCornerActionType.ShowDesktop),
+                new ComboItem("Toggle desktop icons", HotCornerActionType.ToggleDesktopIcons),
                 new ComboItem("Start screen saver", HotCornerActionType.StartScreenSaver),
                 new ComboItem("Turn off monitors", HotCornerActionType.TurnOffMonitors),
                 new ComboItem("Start menu", HotCornerActionType.StartMenu),
@@ -195,6 +340,7 @@ namespace WinXCornersDotNet
                 combo.DisplayMember = nameof(ComboItem.Text);
                 combo.ValueMember = nameof(ComboItem.Value);
                 combo.Items.Clear();
+
                 foreach (var i in items)
                 {
                     combo.Items.Add(i);
@@ -219,10 +365,13 @@ namespace WinXCornersDotNet
 
             txtTopLeftCommand.Text = _settings.TopLeft.CustomExecutablePath ?? string.Empty;
             txtTopLeftArgs.Text = _settings.TopLeft.CustomArguments ?? string.Empty;
+
             txtTopRightCommand.Text = _settings.TopRight.CustomExecutablePath ?? string.Empty;
             txtTopRightArgs.Text = _settings.TopRight.CustomArguments ?? string.Empty;
+
             txtBottomLeftCommand.Text = _settings.BottomLeft.CustomExecutablePath ?? string.Empty;
             txtBottomLeftArgs.Text = _settings.BottomLeft.CustomArguments ?? string.Empty;
+
             txtBottomRightCommand.Text = _settings.BottomRight.CustomExecutablePath ?? string.Empty;
             txtBottomRightArgs.Text = _settings.BottomRight.CustomArguments ?? string.Empty;
 
@@ -233,7 +382,32 @@ namespace WinXCornersDotNet
             chkDisableFullscreen.Checked = _settings.DisableOnFullscreen;
             chkRunOnStartup.Checked = _settings.RunOnStartup;
 
+            // Hotkey settings
+            chkHotkeyEnabled.Checked = _settings.HotkeyEnabled;
+            chkHotkeyCtrl.Checked = _settings.HotkeyCtrl;
+            chkHotkeyAlt.Checked = _settings.HotkeyAlt;
+            chkHotkeyShift.Checked = _settings.HotkeyShift;
+            chkHotkeyWin.Checked = _settings.HotkeyWin;
+            SetHotkeyKeySelection(_settings.HotkeyKeyCode);
+
             UpdateCustomControlsEnabled();
+        }
+
+        private void SetHotkeyKeySelection(int keyCode)
+        {
+            for (int i = 0; i < comboHotkeyKey.Items.Count; i++)
+            {
+                var item = comboHotkeyKey.Items[i];
+                var valueProp = item.GetType().GetProperty("Value");
+                if (valueProp != null && (int)valueProp.GetValue(item)! == keyCode)
+                {
+                    comboHotkeyKey.SelectedIndex = i;
+                    return;
+                }
+            }
+
+            if (comboHotkeyKey.Items.Count > 0)
+                comboHotkeyKey.SelectedIndex = 0;
         }
 
         private static decimal ClampNumeric(NumericUpDown control, int value)
@@ -274,10 +448,13 @@ namespace WinXCornersDotNet
 
             _settings.TopLeft.CustomExecutablePath = txtTopLeftCommand.Text.Trim();
             _settings.TopLeft.CustomArguments = txtTopLeftArgs.Text.Trim();
+
             _settings.TopRight.CustomExecutablePath = txtTopRightCommand.Text.Trim();
             _settings.TopRight.CustomArguments = txtTopRightArgs.Text.Trim();
+
             _settings.BottomLeft.CustomExecutablePath = txtBottomLeftCommand.Text.Trim();
             _settings.BottomLeft.CustomArguments = txtBottomLeftArgs.Text.Trim();
+
             _settings.BottomRight.CustomExecutablePath = txtBottomRightCommand.Text.Trim();
             _settings.BottomRight.CustomArguments = txtBottomRightArgs.Text.Trim();
 
@@ -287,6 +464,22 @@ namespace WinXCornersDotNet
             _settings.Enabled = chkEnabled.Checked;
             _settings.DisableOnFullscreen = chkDisableFullscreen.Checked;
             _settings.RunOnStartup = chkRunOnStartup.Checked;
+
+            // Hotkey settings
+            _settings.HotkeyEnabled = chkHotkeyEnabled.Checked;
+            _settings.HotkeyCtrl = chkHotkeyCtrl.Checked;
+            _settings.HotkeyAlt = chkHotkeyAlt.Checked;
+            _settings.HotkeyShift = chkHotkeyShift.Checked;
+            _settings.HotkeyWin = chkHotkeyWin.Checked;
+
+            if (comboHotkeyKey.SelectedItem != null)
+            {
+                var valueProp = comboHotkeyKey.SelectedItem.GetType().GetProperty("Value");
+                if (valueProp != null)
+                {
+                    _settings.HotkeyKeyCode = (int)valueProp.GetValue(comboHotkeyKey.SelectedItem)!;
+                }
+            }
         }
 
         private void btnSave_Click(object? sender, EventArgs e)
@@ -295,6 +488,9 @@ namespace WinXCornersDotNet
             SettingsService.Save(_settings);
             _hotCornerManager.UpdateSettings(_settings);
             StartupManager.UpdateStartup(_settings.RunOnStartup);
+
+            // Re-register hotkey with new settings
+            RegisterGlobalHotkey();
 
             Hide();
             ShowInTaskbar = false;
@@ -381,6 +577,10 @@ namespace WinXCornersDotNet
 
                 case HotCornerActionType.ShowDesktop:
                     NativeMethods.ShowDesktop();
+                    break;
+
+                case HotCornerActionType.ToggleDesktopIcons:
+                    ToggleDesktopIconsFromTray();
                     break;
 
                 case HotCornerActionType.StartScreenSaver:

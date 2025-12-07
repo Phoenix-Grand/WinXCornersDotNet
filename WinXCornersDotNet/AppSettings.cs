@@ -24,5 +24,13 @@ namespace WinXCornersDotNet
         public bool Enabled { get; set; } = true;
         public bool DisableOnFullscreen { get; set; } = true;
         public bool RunOnStartup { get; set; } = false;
+
+        // Global hotkey settings (default: Ctrl+Alt+D)
+        public bool HotkeyEnabled { get; set; } = true;
+        public bool HotkeyCtrl { get; set; } = true;
+        public bool HotkeyAlt { get; set; } = true;
+        public bool HotkeyShift { get; set; } = false;
+        public bool HotkeyWin { get; set; } = false;
+        public int HotkeyKeyCode { get; set; } = 68; // D key
     }
 }

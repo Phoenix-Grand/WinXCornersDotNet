@@ -19,6 +19,9 @@ namespace WinXCornersDotNet
         StartMenu,
         ActionCenter,
         HideOtherWindows,
-        CustomExecutable
+        CustomExecutable,
+
+        // New action. Placed at the end so existing numeric values in settings.json stay valid.
+        ToggleDesktopIcons
     }
 }

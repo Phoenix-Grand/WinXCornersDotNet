@@ -6,4 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\desktop_icons_visible.ico" />
+    <EmbeddedResource Include="Assets\desktop_icons_hidden.ico" />
+  </ItemGroup>
 </Project>

@@ -52,6 +52,15 @@ namespace WinXCornersDotNet
         private Button btnSave;
         private Button btnCancel;
 
+        // Global hotkey controls
+        private Label labelHotkey;
+        private CheckBox chkHotkeyEnabled;
+        private CheckBox chkHotkeyCtrl;
+        private CheckBox chkHotkeyAlt;
+        private CheckBox chkHotkeyShift;
+        private CheckBox chkHotkeyWin;
+        private ComboBox comboHotkeyKey;
+
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -112,6 +121,15 @@ namespace WinXCornersDotNet
 
             btnSave = new Button();
             btnCancel = new Button();
+
+            // Hotkey controls
+            labelHotkey = new Label();
+            chkHotkeyEnabled = new CheckBox();
+            chkHotkeyCtrl = new CheckBox();
+            chkHotkeyAlt = new CheckBox();
+            chkHotkeyShift = new CheckBox();
+            chkHotkeyWin = new CheckBox();
+            comboHotkeyKey = new ComboBox();
 
             ((System.ComponentModel.ISupportInitialize)numDelay).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numCornerSize).BeginInit();
@@ -315,14 +333,64 @@ namespace WinXCornersDotNet
             chkRunOnStartup.Text = "Run at Windows start";
             chkRunOnStartup.UseVisualStyleBackColor = true;
 
-            // Buttons
-            btnSave.Location = new Point(500, 270);
+            // Global hotkey configuration
+            labelHotkey.AutoSize = true;
+            labelHotkey.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            labelHotkey.Location = new Point(12, 305);
+            labelHotkey.Name = "labelHotkey";
+            labelHotkey.Size = new Size(200, 15);
+            labelHotkey.Text = "Global Hotkey (Toggle Desktop Icons):";
+
+            chkHotkeyEnabled.AutoSize = true;
+            chkHotkeyEnabled.Checked = true;
+            chkHotkeyEnabled.Location = new Point(12, 328);
+            chkHotkeyEnabled.Name = "chkHotkeyEnabled";
+            chkHotkeyEnabled.Size = new Size(118, 19);
+            chkHotkeyEnabled.Text = "Enable hotkey";
+            chkHotkeyEnabled.UseVisualStyleBackColor = true;
+
+            chkHotkeyCtrl.AutoSize = true;
+            chkHotkeyCtrl.Location = new Point(150, 328);
+            chkHotkeyCtrl.Name = "chkHotkeyCtrl";
+            chkHotkeyCtrl.Size = new Size(45, 19);
+            chkHotkeyCtrl.Text = "Ctrl";
+            chkHotkeyCtrl.UseVisualStyleBackColor = true;
+
+            chkHotkeyAlt.AutoSize = true;
+            chkHotkeyAlt.Location = new Point(205, 328);
+            chkHotkeyAlt.Name = "chkHotkeyAlt";
+            chkHotkeyAlt.Size = new Size(41, 19);
+            chkHotkeyAlt.Text = "Alt";
+            chkHotkeyAlt.UseVisualStyleBackColor = true;
+
+            chkHotkeyShift.AutoSize = true;
+            chkHotkeyShift.Location = new Point(255, 328);
+            chkHotkeyShift.Name = "chkHotkeyShift";
+            chkHotkeyShift.Size = new Size(51, 19);
+            chkHotkeyShift.Text = "Shift";
+            chkHotkeyShift.UseVisualStyleBackColor = true;
+
+            chkHotkeyWin.AutoSize = true;
+            chkHotkeyWin.Location = new Point(315, 328);
+            chkHotkeyWin.Name = "chkHotkeyWin";
+            chkHotkeyWin.Size = new Size(47, 19);
+            chkHotkeyWin.Text = "Win";
+            chkHotkeyWin.UseVisualStyleBackColor = true;
+
+            comboHotkeyKey.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboHotkeyKey.Location = new Point(375, 326);
+            comboHotkeyKey.Name = "comboHotkeyKey";
+            comboHotkeyKey.Size = new Size(100, 23);
+            comboHotkeyKey.DropDownHeight = 200;
+
+            // Buttons (moved down)
+            btnSave.Location = new Point(500, 325);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(90, 27);
             btnSave.Text = "Save && Hide";
             btnSave.UseVisualStyleBackColor = true;
 
-            btnCancel.Location = new Point(600, 270);
+            btnCancel.Location = new Point(600, 325);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(90, 27);
             btnCancel.Text = "Cancel";
@@ -371,6 +439,14 @@ namespace WinXCornersDotNet
             Controls.Add(chkDisableFullscreen);
             Controls.Add(chkRunOnStartup);
 
+            Controls.Add(labelHotkey);
+            Controls.Add(chkHotkeyEnabled);
+            Controls.Add(chkHotkeyCtrl);
+            Controls.Add(chkHotkeyAlt);
+            Controls.Add(chkHotkeyShift);
+            Controls.Add(chkHotkeyWin);
+            Controls.Add(comboHotkeyKey);
+
             Controls.Add(btnSave);
             Controls.Add(btnCancel);
 
@@ -380,6 +456,7 @@ namespace WinXCornersDotNet
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "WinXCorners.NET";
+            ClientSize = new Size(710, 365);
 
             ((System.ComponentModel.ISupportInitialize)numDelay).EndInit();
             ((System.ComponentModel.ISupportInitialize)numCornerSize).EndInit();
