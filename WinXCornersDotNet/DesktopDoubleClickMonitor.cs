@@ -27,16 +27,20 @@ namespace WinXCornersDotNet
             // Keep a reference to prevent garbage collection
             _mouseProc = MouseHookCallback;
 
-            using var curProcess = System.Diagnostics.Process.GetCurrentProcess();
-            using var curModule = curProcess.MainModule;
-            
-            if (curModule?.ModuleName != null)
+            // For low-level hooks (WH_MOUSE_LL), the hMod parameter should be IntPtr.Zero
+            _hookHandle = NativeMethods.SetWindowsHookEx(
+                NativeMethods.WH_MOUSE_LL,
+                _mouseProc,
+                IntPtr.Zero,  // For LL hooks, use IntPtr.Zero instead of module handle
+                0);
+
+            if (_hookHandle == IntPtr.Zero)
             {
-                _hookHandle = NativeMethods.SetWindowsHookEx(
-                    NativeMethods.WH_MOUSE_LL,
-                    _mouseProc,
-                    NativeMethods.GetModuleHandle(curModule.ModuleName),
-                    0);
+                System.Diagnostics.Debug.WriteLine($"Failed to set hook, error: {Marshal.GetLastWin32Error()}");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Hook installed successfully: {_hookHandle}");
             }
         }
 
@@ -51,21 +55,39 @@ namespace WinXCornersDotNet
 
         private IntPtr MouseHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && wParam == (IntPtr)NativeMethods.WM_LBUTTONDBLCLK)
+            try
             {
-                var hookStruct = Marshal.PtrToStructure<NativeMethods.MSLLHOOKSTRUCT>(lParam);
+                // Debug: Log all mouse events to help diagnose
+                System.Diagnostics.Debug.WriteLine($"Mouse hook: nCode={nCode}, wParam={wParam}");
                 
-                if (IsDoubleClickOnEmptyDesktop(hookStruct.pt))
+                if (nCode >= 0 && wParam == (IntPtr)NativeMethods.WM_LBUTTONDBLCLK)
                 {
-                    try
+                    System.Diagnostics.Debug.WriteLine("Double-click detected!");
+                    
+                    var hookStruct = Marshal.PtrToStructure<NativeMethods.MSLLHOOKSTRUCT>(lParam);
+                    System.Diagnostics.Debug.WriteLine($"Double-click at: X={hookStruct.pt.X}, Y={hookStruct.pt.Y}");
+                    
+                    if (IsDoubleClickOnEmptyDesktop(hookStruct.pt))
                     {
-                        _onDesktopDoubleClick?.Invoke();
+                        System.Diagnostics.Debug.WriteLine("Double-click on empty desktop - triggering action!");
+                        try
+                        {
+                            _onDesktopDoubleClick?.Invoke();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Exception in callback: {ex}");
+                        }
                     }
-                    catch
+                    else
                     {
-                        // Ignore exceptions from callback to prevent hook issues
+                        System.Diagnostics.Debug.WriteLine("Double-click not on empty desktop");
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception in MouseHookCallback: {ex}");
             }
 
             return NativeMethods.CallNextHookEx(_hookHandle, nCode, wParam, lParam);
@@ -73,22 +95,41 @@ namespace WinXCornersDotNet
 
         private bool IsDoubleClickOnEmptyDesktop(NativeMethods.POINT point)
         {
+            System.Diagnostics.Debug.WriteLine($"Checking if click at ({point.X}, {point.Y}) is on empty desktop");
+            
             // Get the window at the click point
             IntPtr hWnd = NativeMethods.WindowFromPoint(point);
+            System.Diagnostics.Debug.WriteLine($"Window handle: {hWnd}");
+            
             if (hWnd == IntPtr.Zero)
+            {
+                System.Diagnostics.Debug.WriteLine("Window handle is zero");
                 return false;
+            }
 
             // Check if it's the desktop ListView (SysListView32)
             var className = new StringBuilder(256);
             NativeMethods.GetClassName(hWnd, className, className.Capacity);
+            string classNameStr = className.ToString();
+            System.Diagnostics.Debug.WriteLine($"Window class name: {classNameStr}");
             
-            if (className.ToString() != "SysListView32")
+            if (classNameStr != "SysListView32")
+            {
+                System.Diagnostics.Debug.WriteLine("Not SysListView32, skipping");
                 return false;
+            }
+
+            System.Diagnostics.Debug.WriteLine("Found SysListView32!");
 
             // Convert screen coordinates to client coordinates for the hit test
             var clientPoint = point;
             if (!NativeMethods.ScreenToClient(hWnd, ref clientPoint))
+            {
+                System.Diagnostics.Debug.WriteLine("ScreenToClient failed");
                 return false;
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Client coordinates: ({clientPoint.X}, {clientPoint.Y})");
 
             // Now check if the click is on an empty area (not on an icon)
             // We need to do a hit test on the ListView
@@ -106,14 +147,18 @@ namespace WinXCornersDotNet
                 Marshal.StructureToPtr(lvHitTest, pLvHitTest, false);
                 
                 // Send the hit test message
-                _ = NativeMethods.SendMessage(
+                IntPtr result = NativeMethods.SendMessage(
                     hWnd,
                     NativeMethods.LVM_HITTEST,
                     IntPtr.Zero,
                     pLvHitTest);
 
+                System.Diagnostics.Debug.WriteLine($"LVM_HITTEST result: {result}");
+
                 // Read back the result
                 lvHitTest = Marshal.PtrToStructure<NativeMethods.LVHITTESTINFO>(pLvHitTest);
+                
+                System.Diagnostics.Debug.WriteLine($"Hit test result: iItem={lvHitTest.iItem}, flags=0x{lvHitTest.flags:X8}");
             }
             finally
             {
@@ -121,7 +166,10 @@ namespace WinXCornersDotNet
             }
 
             // If iItem is -1 or flags has LVHT_NOWHERE, it means empty space
-            return lvHitTest.iItem == -1 || (lvHitTest.flags & NativeMethods.LVHT_NOWHERE) != 0;
+            bool isEmpty = lvHitTest.iItem == -1 || (lvHitTest.flags & NativeMethods.LVHT_NOWHERE) != 0;
+            System.Diagnostics.Debug.WriteLine($"Is empty desktop: {isEmpty}");
+            
+            return isEmpty;
         }
 
         public void Dispose()
