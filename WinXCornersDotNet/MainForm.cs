@@ -29,7 +29,6 @@ namespace WinXCornersDotNet
             _settings = SettingsService.Load();
 
             InitializeTrayIcon();
-            InitializeGlobalHotkey();
             PopulateActionCombos();
             ApplySettingsToUi();
 
@@ -37,6 +36,14 @@ namespace WinXCornersDotNet
             _hotCornerManager.Start();
 
             FormClosing += MainForm_FormClosing;
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+            
+            // Register hotkey after handle is created
+            RegisterGlobalHotkey();
         }
 
         protected override void OnLoad(EventArgs e)
@@ -228,13 +235,12 @@ namespace WinXCornersDotNet
             Activate();
         }
 
-        private void InitializeGlobalHotkey()
-        {
-            RegisterGlobalHotkey();
-        }
-
         private void RegisterGlobalHotkey()
         {
+            // Don't register if handle not created yet
+            if (!IsHandleCreated)
+                return;
+
             // Unregister any existing hotkey
             NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID);
 
