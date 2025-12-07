@@ -30,7 +30,7 @@ namespace WinXCornersDotNet
             using var curProcess = System.Diagnostics.Process.GetCurrentProcess();
             using var curModule = curProcess.MainModule;
             
-            if (curModule != null)
+            if (curModule?.ModuleName != null)
             {
                 _hookHandle = NativeMethods.SetWindowsHookEx(
                     NativeMethods.WH_MOUSE_LL,
@@ -101,7 +101,7 @@ namespace WinXCornersDotNet
                 Marshal.StructureToPtr(lvHitTest, pLvHitTest, false);
                 
                 // Send the hit test message
-                NativeMethods.SendMessage(
+                _ = NativeMethods.SendMessage(
                     hWnd,
                     NativeMethods.LVM_HITTEST,
                     IntPtr.Zero,

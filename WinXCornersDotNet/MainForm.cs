@@ -414,6 +414,8 @@ namespace WinXCornersDotNet
             for (int i = 0; i < comboHotkeyKey.Items.Count; i++)
             {
                 var item = comboHotkeyKey.Items[i];
+                if (item == null) continue;
+                
                 var valueProp = item.GetType().GetProperty("Value");
                 if (valueProp != null && (int)valueProp.GetValue(item)! == keyCode)
                 {

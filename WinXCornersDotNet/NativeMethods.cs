@@ -134,6 +134,9 @@ namespace WinXCornersDotNet
             if (!GetWindowRect(hWnd, out var rect))
                 return false;
 
+            if (Screen.PrimaryScreen == null)
+                return false;
+
             Rectangle screen = Screen.PrimaryScreen.Bounds;
             const int tolerance = 2;
 
