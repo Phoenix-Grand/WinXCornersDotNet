@@ -13,23 +13,28 @@ namespace WinXCornersDotNet
         {
             try
             {
-                using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true)
-                               ?? Registry.CurrentUser.CreateSubKey(RunKeyPath, true);
+                using RegistryKey? key =
+                    Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true)
+                    ?? Registry.CurrentUser.CreateSubKey(RunKeyPath, true);
+
+                if (key == null)
+                    return;
 
                 if (enable)
                 {
                     string exePath = Application.ExecutablePath;
-                    key.SetValue(AppName, $""{exePath}"");
+                    // Surround with quotes in case the path has spaces
+                    key.SetValue(AppName, "\"" + exePath + "\"");
                 }
                 else
                 {
-                    key.DeleteValue(AppName, false);
+                    key.DeleteValue(AppName, throwOnMissingValue: false);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"Failed to update startup setting:\n{ex.Message}",
+                    "Failed to update startup setting:\n" + ex.Message,
                     "WinXCorners",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
