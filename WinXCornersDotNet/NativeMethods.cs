@@ -58,6 +58,7 @@ namespace WinXCornersDotNet
         public const int WH_MOUSE_LL = 14;
         public const int WM_LBUTTONDBLCLK = 0x0203;
         
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         public delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
         
         [DllImport("user32.dll", SetLastError = true)]
