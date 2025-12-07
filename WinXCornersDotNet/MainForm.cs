@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace WinXCornersDotNet
@@ -12,6 +13,19 @@ namespace WinXCornersDotNet
         private NotifyIcon _notifyIcon = null!;
         private ContextMenuStrip _trayMenu = null!;
         private bool _allowClose;
+
+        // ===== Show/Hide desktop icons hotkey =====
+        private const int HOTKEY_ID = 0x1234;
+        private const uint MOD_ALT = 0x0001;
+        private const uint MOD_CONTROL = 0x0002;
+        private const int VK_D = 0x44;
+        private const int WM_HOTKEY = 0x0312;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
         public MainForm()
         {
@@ -46,9 +60,32 @@ namespace WinXCornersDotNet
             btnSave.Click += btnSave_Click;
             btnCancel.Click += btnCancel_Click;
 
+            // Register Ctrl+Alt+D for toggling desktop icons
+            bool ok = RegisterHotKey(Handle, HOTKEY_ID, MOD_CONTROL | MOD_ALT, VK_D);
+            if (!ok)
+            {
+                MessageBox.Show(
+                    this,
+                    "Could not register hotkey Ctrl+Alt+D.",
+                    "WinXCorners",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
+
             // Start minimized to tray
             Hide();
             ShowInTaskbar = false;
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_HOTKEY && m.WParam.ToInt32() == HOTKEY_ID)
+            {
+                DesktopIcons.Toggle();
+                return;
+            }
+
+            base.WndProc(ref m);
         }
 
         private void InitializeTrayIcon()
@@ -56,6 +93,7 @@ namespace WinXCornersDotNet
             _trayMenu = new ContextMenuStrip();
 
             var settingsItem = new ToolStripMenuItem("Settings", null, (_, _) => ShowFromTray());
+
             var enabledItem = new ToolStripMenuItem("Enable hot corners")
             {
                 CheckOnClick = true,
@@ -68,11 +106,17 @@ namespace WinXCornersDotNet
                 _hotCornerManager.UpdateSettings(_settings);
             };
 
+            var toggleIconsItem = new ToolStripMenuItem(
+                "Toggle desktop icons (Ctrl+Alt+D)",
+                null,
+                (_, _) => DesktopIcons.Toggle());
+
             var exitItem = new ToolStripMenuItem("Exit", null, (_, _) => ExitFromTray());
 
             _trayMenu.Items.Add(settingsItem);
             _trayMenu.Items.Add(new ToolStripSeparator());
             _trayMenu.Items.Add(enabledItem);
+            _trayMenu.Items.Add(toggleIconsItem);
             _trayMenu.Items.Add(new ToolStripSeparator());
             _trayMenu.Items.Add(exitItem);
 
@@ -100,6 +144,10 @@ namespace WinXCornersDotNet
             _allowClose = true;
             _hotCornerManager.Stop();
             _notifyIcon.Visible = false;
+
+            // Clean up hotkey
+            UnregisterHotKey(Handle, HOTKEY_ID);
+
             Application.Exit();
         }
 
