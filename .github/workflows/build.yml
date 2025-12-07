@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
     inputs:
       target_branch:
-        description: "Branch to build (e.g. main, feature/my-branch)"
-        required: false
+        description: "Branch to build (e.g. main, showHide-integration)"
+        required: true
         default: "main"
         type: string
 
@@ -18,17 +18,11 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    # Checkout for push/PR (normal behavior)
-    - name: Checkout (push/PR)
-    - uses: actions/checkout@v4
-      if: github.event_name != 'workflow_dispatch'
-
-    # Checkout for manual run – allow choosing branch
-    - name: Checkout (manual)
-      if: github.event_name == 'workflow_dispatch'
+    - name: Checkout
       uses: actions/checkout@v4
       with:
-        ref: ${{ inputs.target_branch }}
+        # For manual runs, use the chosen branch; otherwise use the branch that triggered the workflow
+        ref: ${{ github.event_name == 'workflow_dispatch' && inputs.target_branch || github.ref }}
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
