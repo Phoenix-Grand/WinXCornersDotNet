@@ -28,6 +28,7 @@ namespace WinXCornersDotNet
         private const int SC_SCREENSAVE = 0xF140;
         private const int SC_MONITORPOWER = 0xF170;
         private const int MONITOR_OFF = 2;
+
         private static readonly IntPtr HWND_BROADCAST = new(0xffff);
 
         private const byte VK_LWIN = 0x5B;
@@ -57,8 +58,11 @@ namespace WinXCornersDotNet
         public static bool IsForegroundWindowFullscreen()
         {
             IntPtr hWnd = GetForegroundWindow();
-            if (hWnd == IntPtr.Zero) return false;
-            if (!GetWindowRect(hWnd, out var rect)) return false;
+            if (hWnd == IntPtr.Zero)
+                return false;
+
+            if (!GetWindowRect(hWnd, out var rect))
+                return false;
 
             Rectangle screen = Screen.PrimaryScreen.Bounds;
             const int tolerance = 2;
@@ -94,6 +98,7 @@ namespace WinXCornersDotNet
 
         public static void HideOtherWindows()
         {
+            // Win + Home
             SendWinKeyCombo(VK_HOME);
         }
 
@@ -104,18 +109,125 @@ namespace WinXCornersDotNet
 
         public static void TurnOffMonitors()
         {
-            SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, new IntPtr(SC_MONITORPOWER), new IntPtr(MONITOR_OFF));
+            SendMessage(
+                HWND_BROADCAST,
+                WM_SYSCOMMAND,
+                new IntPtr(SC_MONITORPOWER),
+                new IntPtr(MONITOR_OFF));
         }
 
         private static void SendWinKeyCombo(byte key)
         {
+            // Win down
             keybd_event(VK_LWIN, 0, 0, UIntPtr.Zero);
+
             if (key != 0)
             {
+                // key down/up
                 keybd_event(key, 0, 0, UIntPtr.Zero);
                 keybd_event(key, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
             }
+
+            // Win up
             keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+        }
+
+        // ===== Desktop icon show/hide support =====
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindow(string? lpClassName, string? lpWindowName);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindowEx(
+            IntPtr parentHandle,
+            IntPtr childAfter,
+            string? lpszClass,
+            string? lpszWindow);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWindowVisible(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+
+        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
+
+        private const int SW_HIDE = 0;
+        private const int SW_SHOW = 5;
+
+        /// <summary>
+        /// Get the SHELLDLL_DefView window that hosts desktop icons.
+        /// Works for Explorer configurations that use Progman or WorkerW.
+        /// </summary>
+        private static IntPtr GetShellViewWindow()
+        {
+            // First try the classic Progman -> SHELLDLL_DefView
+            IntPtr progman = FindWindow("Progman", null);
+            if (progman != IntPtr.Zero)
+            {
+                IntPtr shellView = FindWindowEx(progman, IntPtr.Zero, "SHELLDLL_DefView", null);
+                if (shellView != IntPtr.Zero)
+                    return shellView;
+            }
+
+            // Fallback: Enum all top-level windows, looking for a child SHELLDLL_DefView
+            IntPtr found = IntPtr.Zero;
+
+            EnumWindows((hWnd, _) =>
+            {
+                IntPtr defView = FindWindowEx(hWnd, IntPtr.Zero, "SHELLDLL_DefView", null);
+                if (defView != IntPtr.Zero)
+                {
+                    found = defView;
+                    return false; // stop enum
+                }
+
+                return true; // continue
+            }, IntPtr.Zero);
+
+            return found;
+        }
+
+        /// <summary>
+        /// Returns true if desktop icons are currently visible.
+        /// </summary>
+        public static bool AreDesktopIconsVisible()
+        {
+            IntPtr shellView = GetShellViewWindow();
+            if (shellView == IntPtr.Zero)
+            {
+                // If we can't find it, assume visible so we don't get stuck hidden.
+                return true;
+            }
+
+            return IsWindowVisible(shellView);
+        }
+
+        /// <summary>
+        /// Show or hide the desktop icons.
+        /// </summary>
+        public static void SetDesktopIconsVisible(bool visible)
+        {
+            IntPtr shellView = GetShellViewWindow();
+            if (shellView == IntPtr.Zero)
+                return;
+
+            ShowWindow(shellView, visible ? SW_SHOW : SW_HIDE);
+        }
+
+        /// <summary>
+        /// Toggle desktop icon visibility.
+        /// </summary>
+        public static void ToggleDesktopIcons()
+        {
+            bool currentlyVisible = AreDesktopIconsVisible();
+            SetDesktopIconsVisible(!currentlyVisible);
         }
     }
 }
