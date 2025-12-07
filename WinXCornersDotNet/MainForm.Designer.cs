@@ -399,20 +399,20 @@ namespace WinXCornersDotNet
             chkDoubleClickToggle.Text = "Double-click empty desktop to toggle icons";
             chkDoubleClickToggle.UseVisualStyleBackColor = true;
 
-            // Buttons (moved down)
-            btnApply.Location = new Point(390, 325);
+            // Buttons (moved down to avoid overlap with hotkey controls)
+            btnApply.Location = new Point(390, 360);
             btnApply.Name = "btnApply";
             btnApply.Size = new Size(90, 27);
             btnApply.Text = "Apply";
             btnApply.UseVisualStyleBackColor = true;
 
-            btnSave.Location = new Point(490, 325);
+            btnSave.Location = new Point(490, 360);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(100, 27);
             btnSave.Text = "Save && Hide";
             btnSave.UseVisualStyleBackColor = true;
 
-            btnCancel.Location = new Point(600, 325);
+            btnCancel.Location = new Point(600, 360);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(90, 27);
             btnCancel.Text = "Cancel";
@@ -481,7 +481,7 @@ namespace WinXCornersDotNet
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "WinXCorners.NET";
-            ClientSize = new Size(710, 365);
+            ClientSize = new Size(710, 400);
 
             ((System.ComponentModel.ISupportInitialize)numDelay).EndInit();
             ((System.ComponentModel.ISupportInitialize)numCornerSize).EndInit();
