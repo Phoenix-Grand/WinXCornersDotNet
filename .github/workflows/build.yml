@@ -1,0 +1,40 @@
+name: Build WinXCornersDotNet
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  pull_request:
+    branches: [ "master", "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore
+      run: dotnet restore WinXCornersDotNet/WinXCornersDotNet.csproj
+
+    - name: Build
+      run: dotnet build WinXCornersDotNet/WinXCornersDotNet.csproj -c Release --no-restore
+
+    - name: Publish self-contained single file
+      run: >
+        dotnet publish WinXCornersDotNet/WinXCornersDotNet.csproj
+        -c Release
+        -r win-x64
+        --self-contained true
+        /p:PublishSingleFile=true
+        /p:IncludeNativeLibrariesForSelfExtract=true
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: WinXCornersDotNet
+        path: WinXCornersDotNet/bin/Release/net8.0-windows/win-x64/publish/WinXCornersDotNet.exe
