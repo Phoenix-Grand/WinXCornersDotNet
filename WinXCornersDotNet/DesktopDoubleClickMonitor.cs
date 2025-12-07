@@ -17,15 +17,22 @@ namespace WinXCornersDotNet
         public DesktopDoubleClickMonitor(Action onDesktopDoubleClick)
         {
             _onDesktopDoubleClick = onDesktopDoubleClick ?? throw new ArgumentNullException(nameof(onDesktopDoubleClick));
+            System.Diagnostics.Debug.WriteLine("DesktopDoubleClickMonitor created");
         }
 
         public void Start()
         {
+            System.Diagnostics.Debug.WriteLine("DesktopDoubleClickMonitor.Start() called");
+            
             if (_hookHandle != IntPtr.Zero)
+            {
+                System.Diagnostics.Debug.WriteLine("Hook already installed, skipping");
                 return; // Already started
+            }
 
             // Keep a reference to prevent garbage collection
             _mouseProc = MouseHookCallback;
+            System.Diagnostics.Debug.WriteLine("Mouse proc delegate created");
 
             // For low-level hooks (WH_MOUSE_LL), the hMod parameter should be IntPtr.Zero
             _hookHandle = NativeMethods.SetWindowsHookEx(
@@ -36,11 +43,22 @@ namespace WinXCornersDotNet
 
             if (_hookHandle == IntPtr.Zero)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to set hook, error: {Marshal.GetLastWin32Error()}");
+                int error = Marshal.GetLastWin32Error();
+                string msg = $"Failed to set mouse hook, error code: {error}";
+                System.Diagnostics.Debug.WriteLine(msg);
+                
+                // Also show message box so user can see the error
+                System.Windows.Forms.MessageBox.Show(
+                    msg,
+                    "WinXCorners - Hook Installation Failed",
+                    System.Windows.Forms.MessageBoxButtons.OK,
+                    System.Windows.Forms.MessageBoxIcon.Error);
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine($"Hook installed successfully: {_hookHandle}");
+                string successMsg = $"Mouse hook installed successfully, handle: {_hookHandle}";
+                System.Diagnostics.Debug.WriteLine(successMsg);
+                System.Windows.Forms.MessageBox.Show(successMsg, "Debug", System.Windows.Forms.MessageBoxButtons.OK);
             }
         }
 
