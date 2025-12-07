@@ -61,6 +61,9 @@ namespace WinXCornersDotNet
         private CheckBox chkHotkeyWin;
         private ComboBox comboHotkeyKey;
 
+        // Double-click toggle
+        private CheckBox chkDoubleClickToggle;
+
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -130,6 +133,8 @@ namespace WinXCornersDotNet
             chkHotkeyShift = new CheckBox();
             chkHotkeyWin = new CheckBox();
             comboHotkeyKey = new ComboBox();
+
+            chkDoubleClickToggle = new CheckBox();
 
             ((System.ComponentModel.ISupportInitialize)numDelay).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numCornerSize).BeginInit();
@@ -383,6 +388,15 @@ namespace WinXCornersDotNet
             comboHotkeyKey.Size = new Size(100, 23);
             comboHotkeyKey.DropDownHeight = 200;
 
+            // Double-click toggle
+            chkDoubleClickToggle.AutoSize = true;
+            chkDoubleClickToggle.Checked = true;
+            chkDoubleClickToggle.Location = new Point(200, 275);
+            chkDoubleClickToggle.Name = "chkDoubleClickToggle";
+            chkDoubleClickToggle.Size = new Size(252, 19);
+            chkDoubleClickToggle.Text = "Double-click empty desktop to toggle icons";
+            chkDoubleClickToggle.UseVisualStyleBackColor = true;
+
             // Buttons (moved down)
             btnSave.Location = new Point(500, 325);
             btnSave.Name = "btnSave";
@@ -438,6 +452,8 @@ namespace WinXCornersDotNet
             Controls.Add(chkEnabled);
             Controls.Add(chkDisableFullscreen);
             Controls.Add(chkRunOnStartup);
+
+            Controls.Add(chkDoubleClickToggle);
 
             Controls.Add(labelHotkey);
             Controls.Add(chkHotkeyEnabled);

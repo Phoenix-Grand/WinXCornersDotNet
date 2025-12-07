@@ -22,6 +22,9 @@ namespace WinXCornersDotNet
         // Global hotkey ID for Ctrl+Alt+D
         private const int HOTKEY_ID = 1;
 
+        // Desktop double-click monitor
+        private DesktopDoubleClickMonitor? _doubleClickMonitor;
+
         public MainForm()
         {
             InitializeComponent();
@@ -34,6 +37,13 @@ namespace WinXCornersDotNet
 
             _hotCornerManager = new HotCornerManager(_settings, OnCornerTriggered);
             _hotCornerManager.Start();
+
+            // Initialize double-click monitor
+            _doubleClickMonitor = new DesktopDoubleClickMonitor(ToggleDesktopIconsFromTray);
+            if (_settings.DoubleClickToggle)
+            {
+                _doubleClickMonitor.Start();
+            }
 
             FormClosing += MainForm_FormClosing;
         }
@@ -285,6 +295,10 @@ namespace WinXCornersDotNet
             _allowClose = true;
             _hotCornerManager.Stop();
             
+            // Stop and dispose double-click monitor
+            _doubleClickMonitor?.Stop();
+            _doubleClickMonitor?.Dispose();
+            
             // Unregister the global hotkey
             NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID);
             
@@ -382,6 +396,8 @@ namespace WinXCornersDotNet
             chkDisableFullscreen.Checked = _settings.DisableOnFullscreen;
             chkRunOnStartup.Checked = _settings.RunOnStartup;
 
+            chkDoubleClickToggle.Checked = _settings.DoubleClickToggle;
+
             // Hotkey settings
             chkHotkeyEnabled.Checked = _settings.HotkeyEnabled;
             chkHotkeyCtrl.Checked = _settings.HotkeyCtrl;
@@ -465,6 +481,8 @@ namespace WinXCornersDotNet
             _settings.DisableOnFullscreen = chkDisableFullscreen.Checked;
             _settings.RunOnStartup = chkRunOnStartup.Checked;
 
+            _settings.DoubleClickToggle = chkDoubleClickToggle.Checked;
+
             // Hotkey settings
             _settings.HotkeyEnabled = chkHotkeyEnabled.Checked;
             _settings.HotkeyCtrl = chkHotkeyCtrl.Checked;
@@ -491,6 +509,16 @@ namespace WinXCornersDotNet
 
             // Re-register hotkey with new settings
             RegisterGlobalHotkey();
+
+            // Update double-click monitor state
+            if (_settings.DoubleClickToggle)
+            {
+                _doubleClickMonitor?.Start();
+            }
+            else
+            {
+                _doubleClickMonitor?.Stop();
+            }
 
             Hide();
             ShowInTaskbar = false;

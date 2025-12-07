@@ -32,5 +32,8 @@ namespace WinXCornersDotNet
         public bool HotkeyShift { get; set; } = false;
         public bool HotkeyWin { get; set; } = false;
         public int HotkeyKeyCode { get; set; } = 68; // D key
+
+        // Desktop double-click toggle
+        public bool DoubleClickToggle { get; set; } = true;
     }
 }
