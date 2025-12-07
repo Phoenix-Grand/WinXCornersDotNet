@@ -1,0 +1,121 @@
+using System;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
+
+namespace WinXCornersDotNet
+{
+    internal static class NativeMethods
+    {
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X;
+            public int Y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
+        }
+
+        private const uint KEYEVENTF_KEYUP = 0x0002;
+        private const uint WM_SYSCOMMAND = 0x0112;
+        private const int SC_SCREENSAVE = 0xF140;
+        private const int SC_MONITORPOWER = 0xF170;
+        private const int MONITOR_OFF = 2;
+        private static readonly IntPtr HWND_BROADCAST = new(0xffff);
+
+        private const byte VK_LWIN = 0x5B;
+        private const byte VK_TAB = 0x09;
+        private const byte VK_D = 0x44;
+        private const byte VK_HOME = 0x24;
+        private const byte VK_A = 0x41;
+
+        [DllImport("user32.dll")]
+        public static extern bool GetCursorPos(out POINT lpPoint);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        private static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [DllImport("user32.dll")]
+        private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetDesktopWindow();
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+
+        public static bool IsForegroundWindowFullscreen()
+        {
+            IntPtr hWnd = GetForegroundWindow();
+            if (hWnd == IntPtr.Zero) return false;
+            if (!GetWindowRect(hWnd, out var rect)) return false;
+
+            Rectangle screen = Screen.PrimaryScreen.Bounds;
+            const int tolerance = 2;
+
+            return rect.Left <= screen.Left + tolerance &&
+                   rect.Top <= screen.Top + tolerance &&
+                   rect.Right >= screen.Right - tolerance &&
+                   rect.Bottom >= screen.Bottom - tolerance;
+        }
+
+        public static void ShowDesktop()
+        {
+            SendWinKeyCombo(VK_D);
+        }
+
+        public static void ShowAllWindowsTaskView()
+        {
+            SendWinKeyCombo(VK_TAB);
+        }
+
+        public static void ToggleActionCenter()
+        {
+            // Windows 10/11: Win + A
+            SendWinKeyCombo(VK_A);
+        }
+
+        public static void ShowStartMenu()
+        {
+            // Press and release Win alone
+            keybd_event(VK_LWIN, 0, 0, UIntPtr.Zero);
+            keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+        }
+
+        public static void HideOtherWindows()
+        {
+            SendWinKeyCombo(VK_HOME);
+        }
+
+        public static void StartScreenSaver()
+        {
+            SendMessage(GetDesktopWindow(), WM_SYSCOMMAND, new IntPtr(SC_SCREENSAVE), IntPtr.Zero);
+        }
+
+        public static void TurnOffMonitors()
+        {
+            SendMessage(HWND_BROADCAST, WM_SYSCOMMAND, new IntPtr(SC_MONITORPOWER), new IntPtr(MONITOR_OFF));
+        }
+
+        private static void SendWinKeyCombo(byte key)
+        {
+            keybd_event(VK_LWIN, 0, 0, UIntPtr.Zero);
+            if (key != 0)
+            {
+                keybd_event(key, 0, 0, UIntPtr.Zero);
+                keybd_event(key, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+            }
+            keybd_event(VK_LWIN, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+        }
+    }
+}
