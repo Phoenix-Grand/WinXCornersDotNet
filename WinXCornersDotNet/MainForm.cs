@@ -72,6 +72,7 @@ namespace WinXCornersDotNet
             btnBrowseBottomRight.Click += btnBrowseBottomRight_Click;
 
             btnSave.Click += btnSave_Click;
+            btnApply.Click += btnApply_Click;
             btnCancel.Click += btnCancel_Click;
 
             // Wire hotkey change events
@@ -524,6 +525,30 @@ namespace WinXCornersDotNet
 
             Hide();
             ShowInTaskbar = false;
+        }
+
+        private void btnApply_Click(object? sender, EventArgs e)
+        {
+            // Same as Save but doesn't hide the window
+            ReadSettingsFromUi();
+            SettingsService.Save(_settings);
+            _hotCornerManager.UpdateSettings(_settings);
+            StartupManager.UpdateStartup(_settings.RunOnStartup);
+
+            // Re-register hotkey with new settings
+            RegisterGlobalHotkey();
+
+            // Update double-click monitor state
+            if (_settings.DoubleClickToggle)
+            {
+                _doubleClickMonitor?.Start();
+            }
+            else
+            {
+                _doubleClickMonitor?.Stop();
+            }
+
+            // Don't hide - that's the point of Apply!
         }
 
         private void btnCancel_Click(object? sender, EventArgs e)

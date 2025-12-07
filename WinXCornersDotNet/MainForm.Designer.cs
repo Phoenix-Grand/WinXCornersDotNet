@@ -51,6 +51,7 @@ namespace WinXCornersDotNet
 
         private Button btnSave;
         private Button btnCancel;
+        private Button btnApply;
 
         // Global hotkey controls
         private Label labelHotkey;
@@ -124,6 +125,7 @@ namespace WinXCornersDotNet
 
             btnSave = new Button();
             btnCancel = new Button();
+            btnApply = new Button();
 
             // Hotkey controls
             labelHotkey = new Label();
@@ -398,9 +400,15 @@ namespace WinXCornersDotNet
             chkDoubleClickToggle.UseVisualStyleBackColor = true;
 
             // Buttons (moved down)
-            btnSave.Location = new Point(500, 325);
+            btnApply.Location = new Point(390, 325);
+            btnApply.Name = "btnApply";
+            btnApply.Size = new Size(90, 27);
+            btnApply.Text = "Apply";
+            btnApply.UseVisualStyleBackColor = true;
+
+            btnSave.Location = new Point(490, 325);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(90, 27);
+            btnSave.Size = new Size(100, 27);
             btnSave.Text = "Save && Hide";
             btnSave.UseVisualStyleBackColor = true;
 
@@ -463,6 +471,7 @@ namespace WinXCornersDotNet
             Controls.Add(chkHotkeyWin);
             Controls.Add(comboHotkeyKey);
 
+            Controls.Add(btnApply);
             Controls.Add(btnSave);
             Controls.Add(btnCancel);
 
