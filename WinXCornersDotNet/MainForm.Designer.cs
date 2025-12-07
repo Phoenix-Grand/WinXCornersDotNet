@@ -396,7 +396,7 @@ namespace WinXCornersDotNet
             chkDoubleClickToggle.Location = new Point(200, 275);
             chkDoubleClickToggle.Name = "chkDoubleClickToggle";
             chkDoubleClickToggle.Size = new Size(252, 19);
-            chkDoubleClickToggle.Text = "Double-click empty desktop to toggle icons";
+            chkDoubleClickToggle.Text = "Double-click empty desktop to toggle icons (disabled for now due to compatibility issues)";
             chkDoubleClickToggle.UseVisualStyleBackColor = true;
 
             // Buttons (moved down to avoid overlap with hotkey controls)
