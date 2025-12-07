@@ -34,11 +34,15 @@ namespace WinXCornersDotNet
             _mouseProc = MouseHookCallback;
             System.Diagnostics.Debug.WriteLine("Mouse proc delegate created");
 
-            // For low-level hooks (WH_MOUSE_LL), the hMod parameter should be IntPtr.Zero
+            // For managed code, we need to get the module handle of the current process
+            // Using IntPtr.Zero doesn't work properly for managed callbacks
+            IntPtr hModule = NativeMethods.GetModuleHandle(null);
+            System.Diagnostics.Debug.WriteLine($"Module handle: {hModule}");
+            
             _hookHandle = NativeMethods.SetWindowsHookEx(
                 NativeMethods.WH_MOUSE_LL,
                 _mouseProc,
-                IntPtr.Zero,  // For LL hooks, use IntPtr.Zero instead of module handle
+                hModule,  // Use current process module handle, not IntPtr.Zero
                 0);
 
             if (_hookHandle == IntPtr.Zero)
