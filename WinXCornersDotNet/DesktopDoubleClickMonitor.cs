@@ -45,21 +45,11 @@ namespace WinXCornersDotNet
             if (_hookHandle == IntPtr.Zero)
             {
                 int error = Marshal.GetLastWin32Error();
-                string msg = $"Failed to set mouse hook, error code: {error}";
-                System.Diagnostics.Debug.WriteLine(msg);
-                
-                // Also show message box so user can see the error
-                System.Windows.Forms.MessageBox.Show(
-                    msg,
-                    "WinXCorners - Hook Installation Failed",
-                    System.Windows.Forms.MessageBoxButtons.OK,
-                    System.Windows.Forms.MessageBoxIcon.Error);
+                System.Diagnostics.Debug.WriteLine($"Failed to set mouse hook, error code: {error}");
             }
             else
             {
-                string successMsg = $"Mouse hook installed successfully, handle: {_hookHandle}";
-                System.Diagnostics.Debug.WriteLine(successMsg);
-                System.Windows.Forms.MessageBox.Show(successMsg, "Debug", System.Windows.Forms.MessageBoxButtons.OK);
+                System.Diagnostics.Debug.WriteLine($"Mouse hook installed successfully, handle: {_hookHandle}");
             }
         }
 
@@ -81,13 +71,6 @@ namespace WinXCornersDotNet
                 
                 if (nCode >= 0 && wParam == (IntPtr)NativeMethods.WM_LBUTTONDBLCLK)
                 {
-                    // VISIBLE TEST: Show message box to prove callback is triggered
-                    System.Windows.Forms.MessageBox.Show(
-                        "Double-click detected by hook!", 
-                        "Debug - Hook Working",
-                        System.Windows.Forms.MessageBoxButtons.OK,
-                        System.Windows.Forms.MessageBoxIcon.Information);
-                    
                     System.Diagnostics.Debug.WriteLine("Double-click detected!");
                     
                     var hookStruct = Marshal.PtrToStructure<NativeMethods.MSLLHOOKSTRUCT>(lParam);

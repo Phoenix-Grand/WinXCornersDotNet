@@ -34,6 +34,8 @@ namespace WinXCornersDotNet
         public int HotkeyKeyCode { get; set; } = 68; // D key
 
         // Desktop double-click toggle
-        public bool DoubleClickToggle { get; set; } = true;
+        // NOTE: Currently disabled due to Windows hook compatibility issues in .NET
+        // Use the hotkey (Ctrl+Alt+D) or tray menu instead
+        public bool DoubleClickToggle { get; set; } = false;
     }
 }
