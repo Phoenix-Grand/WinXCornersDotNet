@@ -15,6 +15,7 @@ namespace WinXCornersDotNet
         private Label labelHeaderAction;
         private Label labelHeaderCommand;
         private Label labelHeaderArgs;
+        private Label labelHeaderDelay;
 
         private Label labelTopLeft;
         private ComboBox comboTopLeft;
@@ -39,6 +40,12 @@ namespace WinXCornersDotNet
         private TextBox txtBottomRightCommand;
         private TextBox txtBottomRightArgs;
         private Button btnBrowseBottomRight;
+
+        // Per-corner delay controls
+        private NumericUpDown numTopLeftDelay;
+        private NumericUpDown numTopRightDelay;
+        private NumericUpDown numBottomLeftDelay;
+        private NumericUpDown numBottomRightDelay;
 
         private Label labelDelay;
         private NumericUpDown numDelay;
@@ -89,6 +96,7 @@ namespace WinXCornersDotNet
             labelHeaderAction = new Label();
             labelHeaderCommand = new Label();
             labelHeaderArgs = new Label();
+            labelHeaderDelay = new Label();
 
             labelTopLeft = new Label();
             comboTopLeft = new ComboBox();
@@ -113,6 +121,12 @@ namespace WinXCornersDotNet
             txtBottomRightCommand = new TextBox();
             txtBottomRightArgs = new TextBox();
             btnBrowseBottomRight = new Button();
+
+            // Per-corner delays
+            numTopLeftDelay = new NumericUpDown();
+            numTopRightDelay = new NumericUpDown();
+            numBottomLeftDelay = new NumericUpDown();
+            numBottomRightDelay = new NumericUpDown();
 
             labelDelay = new Label();
             numDelay = new NumericUpDown();
@@ -140,6 +154,10 @@ namespace WinXCornersDotNet
 
             ((System.ComponentModel.ISupportInitialize)numDelay).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numCornerSize).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numTopLeftDelay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numTopRightDelay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numBottomLeftDelay).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numBottomRightDelay).BeginInit();
             SuspendLayout();
 
             // labelTitle
@@ -175,6 +193,12 @@ namespace WinXCornersDotNet
             labelHeaderArgs.Size = new Size(60, 15);
             labelHeaderArgs.Text = "Arguments";
 
+            labelHeaderDelay.AutoSize = true;
+            labelHeaderDelay.Location = new Point(710, 40);
+            labelHeaderDelay.Name = "labelHeaderDelay";
+            labelHeaderDelay.Size = new Size(100, 15);
+            labelHeaderDelay.Text = "Delay (ms, 0=default)";
+
             int row1Y = 65;
             int rowSpacing = 35;
 
@@ -204,6 +228,13 @@ namespace WinXCornersDotNet
             txtTopLeftArgs.Name = "txtTopLeftArgs";
             txtTopLeftArgs.Size = new Size(150, 23);
 
+            numTopLeftDelay.Location = new Point(710, row1Y - 3);
+            numTopLeftDelay.Name = "numTopLeftDelay";
+            numTopLeftDelay.Size = new Size(70, 23);
+            numTopLeftDelay.Maximum = 5000;
+            numTopLeftDelay.Minimum = 0;
+            numTopLeftDelay.Value = 0;
+
             // Top Right row
             int row2Y = row1Y + rowSpacing;
 
@@ -231,6 +262,13 @@ namespace WinXCornersDotNet
             txtTopRightArgs.Location = new Point(550, row2Y - 3);
             txtTopRightArgs.Name = "txtTopRightArgs";
             txtTopRightArgs.Size = new Size(150, 23);
+
+            numTopRightDelay.Location = new Point(710, row2Y - 3);
+            numTopRightDelay.Name = "numTopRightDelay";
+            numTopRightDelay.Size = new Size(70, 23);
+            numTopRightDelay.Maximum = 5000;
+            numTopRightDelay.Minimum = 0;
+            numTopRightDelay.Value = 0;
 
             // Bottom Left row
             int row3Y = row2Y + rowSpacing;
@@ -260,6 +298,13 @@ namespace WinXCornersDotNet
             txtBottomLeftArgs.Name = "txtBottomLeftArgs";
             txtBottomLeftArgs.Size = new Size(150, 23);
 
+            numBottomLeftDelay.Location = new Point(710, row3Y - 3);
+            numBottomLeftDelay.Name = "numBottomLeftDelay";
+            numBottomLeftDelay.Size = new Size(70, 23);
+            numBottomLeftDelay.Maximum = 5000;
+            numBottomLeftDelay.Minimum = 0;
+            numBottomLeftDelay.Value = 0;
+
             // Bottom Right row
             int row4Y = row3Y + rowSpacing;
 
@@ -287,6 +332,13 @@ namespace WinXCornersDotNet
             txtBottomRightArgs.Location = new Point(550, row4Y - 3);
             txtBottomRightArgs.Name = "txtBottomRightArgs";
             txtBottomRightArgs.Size = new Size(150, 23);
+
+            numBottomRightDelay.Location = new Point(710, row4Y - 3);
+            numBottomRightDelay.Name = "numBottomRightDelay";
+            numBottomRightDelay.Size = new Size(70, 23);
+            numBottomRightDelay.Maximum = 5000;
+            numBottomRightDelay.Minimum = 0;
+            numBottomRightDelay.Value = 0;
 
             // Delay
             labelDelay.AutoSize = true;
@@ -421,36 +473,41 @@ namespace WinXCornersDotNet
             // MainForm
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(710, 310);
+            ClientSize = new Size(800, 400);  // Increased width for delay column
             Controls.Add(labelTitle);
             Controls.Add(labelHeaderCorner);
             Controls.Add(labelHeaderAction);
             Controls.Add(labelHeaderCommand);
             Controls.Add(labelHeaderArgs);
+            Controls.Add(labelHeaderDelay);
 
             Controls.Add(labelTopLeft);
             Controls.Add(comboTopLeft);
             Controls.Add(txtTopLeftCommand);
             Controls.Add(btnBrowseTopLeft);
             Controls.Add(txtTopLeftArgs);
+            Controls.Add(numTopLeftDelay);
 
             Controls.Add(labelTopRight);
             Controls.Add(comboTopRight);
             Controls.Add(txtTopRightCommand);
             Controls.Add(btnBrowseTopRight);
             Controls.Add(txtTopRightArgs);
+            Controls.Add(numTopRightDelay);
 
             Controls.Add(labelBottomLeft);
             Controls.Add(comboBottomLeft);
             Controls.Add(txtBottomLeftCommand);
             Controls.Add(btnBrowseBottomLeft);
             Controls.Add(txtBottomLeftArgs);
+            Controls.Add(numBottomLeftDelay);
 
             Controls.Add(labelBottomRight);
             Controls.Add(comboBottomRight);
             Controls.Add(txtBottomRightCommand);
             Controls.Add(btnBrowseBottomRight);
             Controls.Add(txtBottomRightArgs);
+            Controls.Add(numBottomRightDelay);
 
             Controls.Add(labelDelay);
             Controls.Add(numDelay);
@@ -481,10 +538,14 @@ namespace WinXCornersDotNet
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "WinXCorners.NET";
-            ClientSize = new Size(710, 400);
+            ClientSize = new Size(800, 400);  // Increased width for delay column
 
             ((System.ComponentModel.ISupportInitialize)numDelay).EndInit();
             ((System.ComponentModel.ISupportInitialize)numCornerSize).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numTopLeftDelay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numTopRightDelay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numBottomLeftDelay).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numBottomRightDelay).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }

@@ -13,6 +13,7 @@
 
 ### 1.3
 - Added "apply" button to settings window
+- Added individual corner timing support (each corner can have its own activation delay)
 
 ### 1.2
 - Added Desktop icons show/hide functionality

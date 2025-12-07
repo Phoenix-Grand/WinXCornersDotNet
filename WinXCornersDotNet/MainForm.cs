@@ -380,15 +380,19 @@ namespace WinXCornersDotNet
 
             txtTopLeftCommand.Text = _settings.TopLeft.CustomExecutablePath ?? string.Empty;
             txtTopLeftArgs.Text = _settings.TopLeft.CustomArguments ?? string.Empty;
+            numTopLeftDelay.Value = ClampNumeric(numTopLeftDelay, _settings.TopLeft.DelayMs);
 
             txtTopRightCommand.Text = _settings.TopRight.CustomExecutablePath ?? string.Empty;
             txtTopRightArgs.Text = _settings.TopRight.CustomArguments ?? string.Empty;
+            numTopRightDelay.Value = ClampNumeric(numTopRightDelay, _settings.TopRight.DelayMs);
 
             txtBottomLeftCommand.Text = _settings.BottomLeft.CustomExecutablePath ?? string.Empty;
             txtBottomLeftArgs.Text = _settings.BottomLeft.CustomArguments ?? string.Empty;
+            numBottomLeftDelay.Value = ClampNumeric(numBottomLeftDelay, _settings.BottomLeft.DelayMs);
 
             txtBottomRightCommand.Text = _settings.BottomRight.CustomExecutablePath ?? string.Empty;
             txtBottomRightArgs.Text = _settings.BottomRight.CustomArguments ?? string.Empty;
+            numBottomRightDelay.Value = ClampNumeric(numBottomRightDelay, _settings.BottomRight.DelayMs);
 
             numDelay.Value = ClampNumeric(numDelay, _settings.GlobalDelayMs);
             numCornerSize.Value = ClampNumeric(numCornerSize, _settings.CornerSizePx);
@@ -467,15 +471,19 @@ namespace WinXCornersDotNet
 
             _settings.TopLeft.CustomExecutablePath = txtTopLeftCommand.Text.Trim();
             _settings.TopLeft.CustomArguments = txtTopLeftArgs.Text.Trim();
+            _settings.TopLeft.DelayMs = (int)numTopLeftDelay.Value;
 
             _settings.TopRight.CustomExecutablePath = txtTopRightCommand.Text.Trim();
             _settings.TopRight.CustomArguments = txtTopRightArgs.Text.Trim();
+            _settings.TopRight.DelayMs = (int)numTopRightDelay.Value;
 
             _settings.BottomLeft.CustomExecutablePath = txtBottomLeftCommand.Text.Trim();
             _settings.BottomLeft.CustomArguments = txtBottomLeftArgs.Text.Trim();
+            _settings.BottomLeft.DelayMs = (int)numBottomLeftDelay.Value;
 
             _settings.BottomRight.CustomExecutablePath = txtBottomRightCommand.Text.Trim();
             _settings.BottomRight.CustomArguments = txtBottomRightArgs.Text.Trim();
+            _settings.BottomRight.DelayMs = (int)numBottomRightDelay.Value;
 
             _settings.GlobalDelayMs = (int)numDelay.Value;
             _settings.CornerSizePx = (int)numCornerSize.Value;
