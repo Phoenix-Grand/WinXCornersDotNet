@@ -89,9 +89,6 @@ namespace WinXCornersDotNet
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         public static extern int GetClassName(IntPtr hWnd, System.Text.StringBuilder lpClassName, int nMaxCount);
         
-        [DllImport("user32.dll")]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
-        
         public const uint LVM_HITTEST = 0x1000 + 18;
         
         [StructLayout(LayoutKind.Sequential)]
