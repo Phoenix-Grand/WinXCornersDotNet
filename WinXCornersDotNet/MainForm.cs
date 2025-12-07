@@ -1,7 +1,6 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace WinXCornersDotNet
@@ -14,24 +13,17 @@ namespace WinXCornersDotNet
         private ContextMenuStrip _trayMenu = null!;
         private bool _allowClose;
 
-        // ===== Show/Hide desktop icons hotkey =====
-        private const int HOTKEY_ID = 0x1234;
-        private const uint MOD_ALT = 0x0001;
-        private const uint MOD_CONTROL = 0x0002;
-        private const int VK_D = 0x44;
-        private const int WM_HOTKEY = 0x0312;
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+        // New: tray icon variants + state for desktop icons
+        private Icon _trayIconDesktopVisible = null!;
+        private Icon _trayIconDesktopHidden = null!;
+        private bool _desktopIconsHidden;
 
         public MainForm()
         {
             InitializeComponent();
 
             _settings = SettingsService.Load();
+
             InitializeTrayIcon();
             PopulateActionCombos();
             ApplySettingsToUi();
@@ -60,32 +52,9 @@ namespace WinXCornersDotNet
             btnSave.Click += btnSave_Click;
             btnCancel.Click += btnCancel_Click;
 
-            // Register Ctrl+Alt+D for toggling desktop icons
-            bool ok = RegisterHotKey(Handle, HOTKEY_ID, MOD_CONTROL | MOD_ALT, VK_D);
-            if (!ok)
-            {
-                MessageBox.Show(
-                    this,
-                    "Could not register hotkey Ctrl+Alt+D.",
-                    "WinXCorners",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Warning);
-            }
-
             // Start minimized to tray
             Hide();
             ShowInTaskbar = false;
-        }
-
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == WM_HOTKEY && m.WParam.ToInt32() == HOTKEY_ID)
-            {
-                DesktopIcons.Toggle();
-                return;
-            }
-
-            base.WndProc(ref m);
         }
 
         private void InitializeTrayIcon()
@@ -106,28 +75,66 @@ namespace WinXCornersDotNet
                 _hotCornerManager.UpdateSettings(_settings);
             };
 
-            var toggleIconsItem = new ToolStripMenuItem(
-                "Toggle desktop icons (Ctrl+Alt+D)",
+            // New: toggle desktop icons menu item
+            var toggleDesktopIconsItem = new ToolStripMenuItem(
+                "Toggle desktop icons",
                 null,
-                (_, _) => DesktopIcons.Toggle());
+                (_, _) => ToggleDesktopIconsFromTray());
 
             var exitItem = new ToolStripMenuItem("Exit", null, (_, _) => ExitFromTray());
 
             _trayMenu.Items.Add(settingsItem);
             _trayMenu.Items.Add(new ToolStripSeparator());
             _trayMenu.Items.Add(enabledItem);
-            _trayMenu.Items.Add(toggleIconsItem);
+            _trayMenu.Items.Add(toggleDesktopIconsItem);
             _trayMenu.Items.Add(new ToolStripSeparator());
             _trayMenu.Items.Add(exitItem);
 
+            // New: choose icons for visible/hidden states
+            // (Replace with custom .ico files later if you want)
+            _trayIconDesktopVisible = SystemIcons.Application;
+            _trayIconDesktopHidden = SystemIcons.Warning;
+
+            // New: detect current desktop icon state on startup
+            _desktopIconsHidden = !NativeMethods.AreDesktopIconsVisible();
+
             _notifyIcon = new NotifyIcon
             {
-                Icon = SystemIcons.Application,
                 Visible = true,
-                ContextMenuStrip = _trayMenu,
-                Text = "WinXCorners"
+                ContextMenuStrip = _trayMenu
             };
+
+            UpdateTrayIconAppearance();
+
             _notifyIcon.DoubleClick += (_, _) => ShowFromTray();
+        }
+
+        private void UpdateTrayIconAppearance()
+        {
+            if (_notifyIcon == null)
+                return;
+
+            _notifyIcon.Icon = _desktopIconsHidden
+                ? _trayIconDesktopHidden
+                : _trayIconDesktopVisible;
+
+            string state = _desktopIconsHidden
+                ? "Desktop icons hidden"
+                : "Desktop icons visible";
+
+            // Tooltip text is limited to 63 chars in the Windows notification area
+            _notifyIcon.Text = $"WinXCorners - {state}";
+        }
+
+        private void ToggleDesktopIconsFromTray()
+        {
+            // Ask Windows to toggle icons
+            NativeMethods.ToggleDesktopIcons();
+
+            // Re-read actual state from Explorer so we stay in sync
+            _desktopIconsHidden = !NativeMethods.AreDesktopIconsVisible();
+
+            UpdateTrayIconAppearance();
         }
 
         private void ShowFromTray()
@@ -144,10 +151,6 @@ namespace WinXCornersDotNet
             _allowClose = true;
             _hotCornerManager.Stop();
             _notifyIcon.Visible = false;
-
-            // Clean up hotkey
-            UnregisterHotKey(Handle, HOTKEY_ID);
-
             Application.Exit();
         }
 
@@ -182,6 +185,7 @@ namespace WinXCornersDotNet
                 new ComboItem("None", HotCornerActionType.None),
                 new ComboItem("Show all windows (Task View)", HotCornerActionType.ShowAllWindows),
                 new ComboItem("Show desktop", HotCornerActionType.ShowDesktop),
+                new ComboItem("Toggle desktop icons", HotCornerActionType.ToggleDesktopIcons),
                 new ComboItem("Start screen saver", HotCornerActionType.StartScreenSaver),
                 new ComboItem("Turn off monitors", HotCornerActionType.TurnOffMonitors),
                 new ComboItem("Start menu", HotCornerActionType.StartMenu),
@@ -195,6 +199,7 @@ namespace WinXCornersDotNet
                 combo.DisplayMember = nameof(ComboItem.Text);
                 combo.ValueMember = nameof(ComboItem.Value);
                 combo.Items.Clear();
+
                 foreach (var i in items)
                 {
                     combo.Items.Add(i);
@@ -219,10 +224,13 @@ namespace WinXCornersDotNet
 
             txtTopLeftCommand.Text = _settings.TopLeft.CustomExecutablePath ?? string.Empty;
             txtTopLeftArgs.Text = _settings.TopLeft.CustomArguments ?? string.Empty;
+
             txtTopRightCommand.Text = _settings.TopRight.CustomExecutablePath ?? string.Empty;
             txtTopRightArgs.Text = _settings.TopRight.CustomArguments ?? string.Empty;
+
             txtBottomLeftCommand.Text = _settings.BottomLeft.CustomExecutablePath ?? string.Empty;
             txtBottomLeftArgs.Text = _settings.BottomLeft.CustomArguments ?? string.Empty;
+
             txtBottomRightCommand.Text = _settings.BottomRight.CustomExecutablePath ?? string.Empty;
             txtBottomRightArgs.Text = _settings.BottomRight.CustomArguments ?? string.Empty;
 
@@ -274,10 +282,13 @@ namespace WinXCornersDotNet
 
             _settings.TopLeft.CustomExecutablePath = txtTopLeftCommand.Text.Trim();
             _settings.TopLeft.CustomArguments = txtTopLeftArgs.Text.Trim();
+
             _settings.TopRight.CustomExecutablePath = txtTopRightCommand.Text.Trim();
             _settings.TopRight.CustomArguments = txtTopRightArgs.Text.Trim();
+
             _settings.BottomLeft.CustomExecutablePath = txtBottomLeftCommand.Text.Trim();
             _settings.BottomLeft.CustomArguments = txtBottomLeftArgs.Text.Trim();
+
             _settings.BottomRight.CustomExecutablePath = txtBottomRightCommand.Text.Trim();
             _settings.BottomRight.CustomArguments = txtBottomRightArgs.Text.Trim();
 
@@ -381,6 +392,10 @@ namespace WinXCornersDotNet
 
                 case HotCornerActionType.ShowDesktop:
                     NativeMethods.ShowDesktop();
+                    break;
+
+                case HotCornerActionType.ToggleDesktopIcons:
+                    ToggleDesktopIconsFromTray();
                     break;
 
                 case HotCornerActionType.StartScreenSaver:
