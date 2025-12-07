@@ -123,7 +123,7 @@ namespace WinXCornersDotNet
         private static extern IntPtr GetDesktopWindow();
 
         [DllImport("user32.dll")]
-        private static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
+        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
 
         public static bool IsForegroundWindowFullscreen()
         {
