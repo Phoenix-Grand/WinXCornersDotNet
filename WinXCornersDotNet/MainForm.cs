@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using WinXCornersDotNet.Properties;
 
 namespace WinXCornersDotNet
 {
@@ -13,7 +14,7 @@ namespace WinXCornersDotNet
         private ContextMenuStrip _trayMenu = null!;
         private bool _allowClose;
 
-        // New: tray icon variants + state for desktop icons
+        // Tray icon variants + state for desktop icons
         private Icon _trayIconDesktopVisible = null!;
         private Icon _trayIconDesktopHidden = null!;
         private bool _desktopIconsHidden;
@@ -75,7 +76,7 @@ namespace WinXCornersDotNet
                 _hotCornerManager.UpdateSettings(_settings);
             };
 
-            // New: toggle desktop icons menu item
+            // Toggle desktop icons menu item
             var toggleDesktopIconsItem = new ToolStripMenuItem(
                 "Toggle desktop icons",
                 null,
@@ -90,12 +91,11 @@ namespace WinXCornersDotNet
             _trayMenu.Items.Add(new ToolStripSeparator());
             _trayMenu.Items.Add(exitItem);
 
-            // New: choose icons for visible/hidden states
-            // (Replace with custom .ico files later if you want)
-            _trayIconDesktopVisible = SystemIcons.Application;
-            _trayIconDesktopHidden = SystemIcons.Warning;
+            // Use embedded .ico resources instead of SystemIcons
+            _trayIconDesktopVisible = Resources.desktop_icons_visible;
+            _trayIconDesktopHidden = Resources.desktop_icons_hidden;
 
-            // New: detect current desktop icon state on startup
+            // Detect current desktop icon state on startup
             _desktopIconsHidden = !NativeMethods.AreDesktopIconsVisible();
 
             _notifyIcon = new NotifyIcon
@@ -151,6 +151,9 @@ namespace WinXCornersDotNet
             _allowClose = true;
             _hotCornerManager.Stop();
             _notifyIcon.Visible = false;
+            _notifyIcon.Dispose();
+            _trayIconDesktopVisible?.Dispose();
+            _trayIconDesktopHidden?.Dispose();
             Application.Exit();
         }
 
