@@ -162,21 +162,25 @@ namespace WinXCornersDotNet
         private const int SW_SHOW = 5;
 
         /// <summary>
-        /// Get the SHELLDLL_DefView window that hosts desktop icons.
-        /// Works for Explorer configurations that use Progman or WorkerW.
+        /// Get the SysListView32 window that contains desktop icons.
+        /// This is the child of SHELLDLL_DefView that actually holds the icons.
         /// </summary>
-        private static IntPtr GetShellViewWindow()
+        private static IntPtr GetDesktopIconListView()
         {
-            // First try the classic Progman -> SHELLDLL_DefView
+            // First try the classic Progman -> SHELLDLL_DefView -> SysListView32
             IntPtr progman = FindWindow("Progman", null);
             if (progman != IntPtr.Zero)
             {
                 IntPtr shellView = FindWindowEx(progman, IntPtr.Zero, "SHELLDLL_DefView", null);
                 if (shellView != IntPtr.Zero)
-                    return shellView;
+                {
+                    IntPtr listView = FindWindowEx(shellView, IntPtr.Zero, "SysListView32", null);
+                    if (listView != IntPtr.Zero)
+                        return listView;
+                }
             }
 
-            // Fallback: Enum all top-level windows, looking for a child SHELLDLL_DefView
+            // Fallback: Enum all top-level windows, looking for SHELLDLL_DefView -> SysListView32
             IntPtr found = IntPtr.Zero;
 
             EnumWindows((hWnd, _) =>
@@ -184,8 +188,12 @@ namespace WinXCornersDotNet
                 IntPtr defView = FindWindowEx(hWnd, IntPtr.Zero, "SHELLDLL_DefView", null);
                 if (defView != IntPtr.Zero)
                 {
-                    found = defView;
-                    return false; // stop enum
+                    IntPtr listView = FindWindowEx(defView, IntPtr.Zero, "SysListView32", null);
+                    if (listView != IntPtr.Zero)
+                    {
+                        found = listView;
+                        return false; // stop enum
+                    }
                 }
 
                 return true; // continue
@@ -199,26 +207,26 @@ namespace WinXCornersDotNet
         /// </summary>
         public static bool AreDesktopIconsVisible()
         {
-            IntPtr shellView = GetShellViewWindow();
-            if (shellView == IntPtr.Zero)
+            IntPtr listView = GetDesktopIconListView();
+            if (listView == IntPtr.Zero)
             {
                 // If we can't find it, assume visible so we don't get stuck hidden.
                 return true;
             }
 
-            return IsWindowVisible(shellView);
+            return IsWindowVisible(listView);
         }
 
         /// <summary>
-        /// Show or hide the desktop icons.
+        /// Show or hide the desktop icons (without affecting wallpaper).
         /// </summary>
         public static void SetDesktopIconsVisible(bool visible)
         {
-            IntPtr shellView = GetShellViewWindow();
-            if (shellView == IntPtr.Zero)
+            IntPtr listView = GetDesktopIconListView();
+            if (listView == IntPtr.Zero)
                 return;
 
-            ShowWindow(shellView, visible ? SW_SHOW : SW_HIDE);
+            ShowWindow(listView, visible ? SW_SHOW : SW_HIDE);
         }
 
         /// <summary>
