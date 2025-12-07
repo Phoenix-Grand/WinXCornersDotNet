@@ -50,6 +50,9 @@ namespace WinXCornersDotNet
             if (!NativeMethods.GetCursorPos(out var pt))
                 return;
 
+            if (Screen.PrimaryScreen == null)
+                return;
+
             var screen = Screen.PrimaryScreen.Bounds;
             int size = Math.Max(1, _settings.CornerSizePx);
 
