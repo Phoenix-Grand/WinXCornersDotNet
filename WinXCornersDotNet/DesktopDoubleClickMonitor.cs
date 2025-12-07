@@ -121,6 +121,11 @@ namespace WinXCornersDotNet
 
             System.Diagnostics.Debug.WriteLine("Found SysListView32!");
 
+            // TEMPORARY: Trigger on ANY desktop double-click for testing
+            System.Diagnostics.Debug.WriteLine("TEMPORARILY SKIPPING EMPTY SPACE CHECK - will trigger on ANY desktop double-click");
+            return true;
+
+            /* ORIGINAL CODE - commented out for testing
             // Convert screen coordinates to client coordinates for the hit test
             var clientPoint = point;
             if (!NativeMethods.ScreenToClient(hWnd, ref clientPoint))
@@ -170,6 +175,7 @@ namespace WinXCornersDotNet
             System.Diagnostics.Debug.WriteLine($"Is empty desktop: {isEmpty}");
             
             return isEmpty;
+            */
         }
 
         public void Dispose()
