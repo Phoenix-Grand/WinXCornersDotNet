@@ -19,6 +19,9 @@ namespace WinXCornersDotNet
         private Icon _trayIconDesktopHidden = null!;
         private bool _desktopIconsHidden;
 
+        // Global hotkey ID for Ctrl+Alt+D
+        private const int HOTKEY_ID = 1;
+
         public MainForm()
         {
             InitializeComponent();
@@ -26,6 +29,7 @@ namespace WinXCornersDotNet
             _settings = SettingsService.Load();
 
             InitializeTrayIcon();
+            InitializeGlobalHotkey();
             PopulateActionCombos();
             ApplySettingsToUi();
 
@@ -146,10 +150,41 @@ namespace WinXCornersDotNet
             Activate();
         }
 
+        private void InitializeGlobalHotkey()
+        {
+            // Register Ctrl+Alt+D to toggle desktop icons
+            bool registered = NativeMethods.RegisterHotKey(
+                Handle,
+                HOTKEY_ID,
+                NativeMethods.MOD_CONTROL | NativeMethods.MOD_ALT,
+                (uint)Keys.D);
+
+            if (!registered)
+            {
+                // Log or show warning if registration fails (key already in use)
+                System.Diagnostics.Debug.WriteLine("Failed to register global hotkey Ctrl+Alt+D");
+            }
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == NativeMethods.WM_HOTKEY && m.WParam.ToInt32() == HOTKEY_ID)
+            {
+                // Ctrl+Alt+D was pressed
+                ToggleDesktopIconsFromTray();
+            }
+
+            base.WndProc(ref m);
+        }
+
         private void ExitFromTray()
         {
             _allowClose = true;
             _hotCornerManager.Stop();
+            
+            // Unregister the global hotkey
+            NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID);
+            
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
             _trayIconDesktopVisible?.Dispose();
