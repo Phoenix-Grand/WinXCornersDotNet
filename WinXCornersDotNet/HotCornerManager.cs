@@ -5,7 +5,8 @@ namespace WinXCornersDotNet
 {
     public sealed class HotCornerManager : IDisposable
     {
-        private readonly Timer _timer;
+        // Explicitly use the WinForms timer to avoid ambiguity with System.Threading.Timer
+        private readonly System.Windows.Forms.Timer _timer;
         private AppSettings _settings;
         private readonly Action<HotCorner> _onCornerTriggered;
 
@@ -19,7 +20,7 @@ namespace WinXCornersDotNet
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _onCornerTriggered = onCornerTriggered ?? throw new ArgumentNullException(nameof(onCornerTriggered));
 
-            _timer = new Timer
+            _timer = new System.Windows.Forms.Timer
             {
                 Interval = 30 // ~33 Hz polling
             };
