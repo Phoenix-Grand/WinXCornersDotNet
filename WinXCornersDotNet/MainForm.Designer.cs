@@ -225,19 +225,19 @@ namespace WinXCornersDotNet
             labelHeaderCommand.Text = "Custom executable (optional)";
 
             labelHeaderArgs.AutoSize = true;
-            labelHeaderArgs.Location = new Point(550, 40);
+            labelHeaderArgs.Location = new Point(500, 40);
             labelHeaderArgs.Name = "labelHeaderArgs";
             labelHeaderArgs.Size = new Size(60, 15);
             labelHeaderArgs.Text = "Arguments";
 
             labelHeaderDelay.AutoSize = true;
-            labelHeaderDelay.Location = new Point(710, 40);
+            labelHeaderDelay.Location = new Point(620, 40);
             labelHeaderDelay.Name = "labelHeaderDelay";
             labelHeaderDelay.Size = new Size(100, 15);
             labelHeaderDelay.Text = "Delay (ms, 0=default)";
 
             labelHeaderCountdown.AutoSize = true;
-            labelHeaderCountdown.Location = new Point(790, 40);
+            labelHeaderCountdown.Location = new Point(700, 40);
             labelHeaderCountdown.Name = "labelHeaderCountdown";
             labelHeaderCountdown.Size = new Size(70, 15);
             labelHeaderCountdown.Text = "Show Timer";
@@ -259,19 +259,19 @@ namespace WinXCornersDotNet
 
             txtTopLeftCommand.Location = new Point(250, row1Y - 3);
             txtTopLeftCommand.Name = "txtTopLeftCommand";
-            txtTopLeftCommand.Size = new Size(260, 23);
+            txtTopLeftCommand.Size = new Size(210, 23);
 
-            btnBrowseTopLeft.Location = new Point(516, row1Y - 4);
+            btnBrowseTopLeft.Location = new Point(466, row1Y - 4);
             btnBrowseTopLeft.Name = "btnBrowseTopLeft";
             btnBrowseTopLeft.Size = new Size(28, 25);
             btnBrowseTopLeft.Text = "...";
             btnBrowseTopLeft.UseVisualStyleBackColor = true;
 
-            txtTopLeftArgs.Location = new Point(550, row1Y - 3);
+            txtTopLeftArgs.Location = new Point(500, row1Y - 3);
             txtTopLeftArgs.Name = "txtTopLeftArgs";
-            txtTopLeftArgs.Size = new Size(150, 23);
+            txtTopLeftArgs.Size = new Size(110, 23);
 
-            numTopLeftDelay.Location = new Point(710, row1Y - 3);
+            numTopLeftDelay.Location = new Point(620, row1Y - 3);
             numTopLeftDelay.Name = "numTopLeftDelay";
             numTopLeftDelay.Size = new Size(70, 23);
             numTopLeftDelay.Maximum = 5000;
@@ -279,7 +279,7 @@ namespace WinXCornersDotNet
             numTopLeftDelay.Value = 0;
 
             chkTopLeftCountdown.AutoSize = true;
-            chkTopLeftCountdown.Location = new Point(790, row1Y);
+            chkTopLeftCountdown.Location = new Point(700, row1Y);
             chkTopLeftCountdown.Name = "chkTopLeftCountdown";
             chkTopLeftCountdown.Size = new Size(15, 14);
             chkTopLeftCountdown.UseVisualStyleBackColor = true;
@@ -301,19 +301,19 @@ namespace WinXCornersDotNet
 
             txtTopRightCommand.Location = new Point(250, row2Y - 3);
             txtTopRightCommand.Name = "txtTopRightCommand";
-            txtTopRightCommand.Size = new Size(260, 23);
+            txtTopRightCommand.Size = new Size(210, 23);
 
-            btnBrowseTopRight.Location = new Point(516, row2Y - 4);
+            btnBrowseTopRight.Location = new Point(466, row2Y - 4);
             btnBrowseTopRight.Name = "btnBrowseTopRight";
             btnBrowseTopRight.Size = new Size(28, 25);
             btnBrowseTopRight.Text = "...";
             btnBrowseTopRight.UseVisualStyleBackColor = true;
 
-            txtTopRightArgs.Location = new Point(550, row2Y - 3);
+            txtTopRightArgs.Location = new Point(500, row2Y - 3);
             txtTopRightArgs.Name = "txtTopRightArgs";
-            txtTopRightArgs.Size = new Size(150, 23);
+            txtTopRightArgs.Size = new Size(110, 23);
 
-            numTopRightDelay.Location = new Point(710, row2Y - 3);
+            numTopRightDelay.Location = new Point(620, row2Y - 3);
             numTopRightDelay.Name = "numTopRightDelay";
             numTopRightDelay.Size = new Size(70, 23);
             numTopRightDelay.Maximum = 5000;
@@ -321,7 +321,7 @@ namespace WinXCornersDotNet
             numTopRightDelay.Value = 0;
 
             chkTopRightCountdown.AutoSize = true;
-            chkTopRightCountdown.Location = new Point(790, row2Y);
+            chkTopRightCountdown.Location = new Point(700, row2Y);
             chkTopRightCountdown.Name = "chkTopRightCountdown";
             chkTopRightCountdown.Size = new Size(15, 14);
             chkTopRightCountdown.UseVisualStyleBackColor = true;
@@ -343,19 +343,19 @@ namespace WinXCornersDotNet
 
             txtBottomLeftCommand.Location = new Point(250, row3Y - 3);
             txtBottomLeftCommand.Name = "txtBottomLeftCommand";
-            txtBottomLeftCommand.Size = new Size(260, 23);
+            txtBottomLeftCommand.Size = new Size(210, 23);
 
-            btnBrowseBottomLeft.Location = new Point(516, row3Y - 4);
+            btnBrowseBottomLeft.Location = new Point(466, row3Y - 4);
             btnBrowseBottomLeft.Name = "btnBrowseBottomLeft";
             btnBrowseBottomLeft.Size = new Size(28, 25);
             btnBrowseBottomLeft.Text = "...";
             btnBrowseBottomLeft.UseVisualStyleBackColor = true;
 
-            txtBottomLeftArgs.Location = new Point(550, row3Y - 3);
+            txtBottomLeftArgs.Location = new Point(500, row3Y - 3);
             txtBottomLeftArgs.Name = "txtBottomLeftArgs";
-            txtBottomLeftArgs.Size = new Size(150, 23);
+            txtBottomLeftArgs.Size = new Size(110, 23);
 
-            numBottomLeftDelay.Location = new Point(710, row3Y - 3);
+            numBottomLeftDelay.Location = new Point(620, row3Y - 3);
             numBottomLeftDelay.Name = "numBottomLeftDelay";
             numBottomLeftDelay.Size = new Size(70, 23);
             numBottomLeftDelay.Maximum = 5000;
@@ -363,7 +363,7 @@ namespace WinXCornersDotNet
             numBottomLeftDelay.Value = 0;
 
             chkBottomLeftCountdown.AutoSize = true;
-            chkBottomLeftCountdown.Location = new Point(790, row3Y);
+            chkBottomLeftCountdown.Location = new Point(700, row3Y);
             chkBottomLeftCountdown.Name = "chkBottomLeftCountdown";
             chkBottomLeftCountdown.Size = new Size(15, 14);
             chkBottomLeftCountdown.UseVisualStyleBackColor = true;
@@ -385,19 +385,19 @@ namespace WinXCornersDotNet
 
             txtBottomRightCommand.Location = new Point(250, row4Y - 3);
             txtBottomRightCommand.Name = "txtBottomRightCommand";
-            txtBottomRightCommand.Size = new Size(260, 23);
+            txtBottomRightCommand.Size = new Size(210, 23);
 
-            btnBrowseBottomRight.Location = new Point(516, row4Y - 4);
+            btnBrowseBottomRight.Location = new Point(466, row4Y - 4);
             btnBrowseBottomRight.Name = "btnBrowseBottomRight";
             btnBrowseBottomRight.Size = new Size(28, 25);
             btnBrowseBottomRight.Text = "...";
             btnBrowseBottomRight.UseVisualStyleBackColor = true;
 
-            txtBottomRightArgs.Location = new Point(550, row4Y - 3);
+            txtBottomRightArgs.Location = new Point(500, row4Y - 3);
             txtBottomRightArgs.Name = "txtBottomRightArgs";
-            txtBottomRightArgs.Size = new Size(150, 23);
+            txtBottomRightArgs.Size = new Size(110, 23);
 
-            numBottomRightDelay.Location = new Point(710, row4Y - 3);
+            numBottomRightDelay.Location = new Point(620, row4Y - 3);
             numBottomRightDelay.Name = "numBottomRightDelay";
             numBottomRightDelay.Size = new Size(70, 23);
             numBottomRightDelay.Maximum = 5000;
@@ -405,7 +405,7 @@ namespace WinXCornersDotNet
             numBottomRightDelay.Value = 0;
 
             chkBottomRightCountdown.AutoSize = true;
-            chkBottomRightCountdown.Location = new Point(790, row4Y);
+            chkBottomRightCountdown.Location = new Point(700, row4Y);
             chkBottomRightCountdown.Name = "chkBottomRightCountdown";
             chkBottomRightCountdown.Size = new Size(15, 14);
             chkBottomRightCountdown.UseVisualStyleBackColor = true;
