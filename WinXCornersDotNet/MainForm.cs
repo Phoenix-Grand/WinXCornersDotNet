@@ -21,6 +21,9 @@ namespace WinXCornersDotNet
 
         // Global hotkey ID for Ctrl+Alt+D
         private const int HOTKEY_ID = 1;
+        
+        // Toggle hot corners hotkey ID for Ctrl+Alt+H
+        private const int HOTKEY_ID_TOGGLE = 2;
 
         // Desktop double-click monitor
         private DesktopDoubleClickMonitor? _doubleClickMonitor;
@@ -83,6 +86,14 @@ namespace WinXCornersDotNet
             chkHotkeyWin.CheckedChanged += HotkeySettings_Changed;
             comboHotkeyKey.SelectedIndexChanged += HotkeySettings_Changed;
 
+            // Wire toggle hotkey change events
+            chkToggleHotkeyEnabled.CheckedChanged += ToggleHotkeySettings_Changed;
+            chkToggleHotkeyCtrl.CheckedChanged += ToggleHotkeySettings_Changed;
+            chkToggleHotkeyAlt.CheckedChanged += ToggleHotkeySettings_Changed;
+            chkToggleHotkeyShift.CheckedChanged += ToggleHotkeySettings_Changed;
+            chkToggleHotkeyWin.CheckedChanged += ToggleHotkeySettings_Changed;
+            comboToggleHotkeyKey.SelectedIndexChanged += ToggleHotkeySettings_Changed;
+
             PopulateHotkeyKeys();
 
             // Start minimized to tray
@@ -99,6 +110,17 @@ namespace WinXCornersDotNet
             chkHotkeyShift.Enabled = enabled;
             chkHotkeyWin.Enabled = enabled;
             comboHotkeyKey.Enabled = enabled;
+        }
+
+        private void ToggleHotkeySettings_Changed(object? sender, EventArgs e)
+        {
+            // Enable/disable modifier checkboxes based on toggle hotkey enabled state
+            bool enabled = chkToggleHotkeyEnabled.Checked;
+            chkToggleHotkeyCtrl.Enabled = enabled;
+            chkToggleHotkeyAlt.Enabled = enabled;
+            chkToggleHotkeyShift.Enabled = enabled;
+            chkToggleHotkeyWin.Enabled = enabled;
+            comboToggleHotkeyKey.Enabled = enabled;
         }
 
         private void PopulateHotkeyKeys()
@@ -156,6 +178,19 @@ namespace WinXCornersDotNet
 
             if (comboHotkeyKey.Items.Count > 0)
                 comboHotkeyKey.SelectedIndex = 0;
+
+            // Also populate the toggle hotkey combo
+            comboToggleHotkeyKey.DisplayMember = "Text";
+            comboToggleHotkeyKey.ValueMember = "Value";
+            comboToggleHotkeyKey.Items.Clear();
+
+            foreach (var k in keys)
+            {
+                comboToggleHotkeyKey.Items.Add(k);
+            }
+
+            if (comboToggleHotkeyKey.Items.Count > 0)
+                comboToggleHotkeyKey.SelectedIndex = 0;
         }
 
         private void InitializeTrayIcon()
@@ -252,40 +287,90 @@ namespace WinXCornersDotNet
             if (!IsHandleCreated)
                 return;
 
-            // Unregister any existing hotkey
+            // Unregister any existing hotkeys
             NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID);
+            NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID_TOGGLE);
 
-            // Only register if enabled
-            if (!_settings.HotkeyEnabled)
-                return;
-
-            // Build modifier flags
-            uint modifiers = 0;
-            if (_settings.HotkeyCtrl) modifiers |= NativeMethods.MOD_CONTROL;
-            if (_settings.HotkeyAlt) modifiers |= NativeMethods.MOD_ALT;
-            if (_settings.HotkeyShift) modifiers |= NativeMethods.MOD_SHIFT;
-            if (_settings.HotkeyWin) modifiers |= NativeMethods.MOD_WIN;
-
-            // Register Ctrl+Alt+D to toggle desktop icons
-            bool registered = NativeMethods.RegisterHotKey(
-                Handle,
-                HOTKEY_ID,
-                modifiers,
-                (uint)_settings.HotkeyKeyCode);
-
-            if (!registered)
+            // Register desktop icons toggle hotkey if enabled
+            if (_settings.HotkeyEnabled)
             {
-                // Log or show warning if registration fails (key already in use)
-                System.Diagnostics.Debug.WriteLine($"Failed to register global hotkey with modifiers {modifiers} and key {_settings.HotkeyKeyCode}");
+                // Build modifier flags
+                uint modifiers = 0;
+                if (_settings.HotkeyCtrl) modifiers |= NativeMethods.MOD_CONTROL;
+                if (_settings.HotkeyAlt) modifiers |= NativeMethods.MOD_ALT;
+                if (_settings.HotkeyShift) modifiers |= NativeMethods.MOD_SHIFT;
+                if (_settings.HotkeyWin) modifiers |= NativeMethods.MOD_WIN;
+
+                // Register Ctrl+Alt+D to toggle desktop icons
+                bool registered = NativeMethods.RegisterHotKey(
+                    Handle,
+                    HOTKEY_ID,
+                    modifiers,
+                    (uint)_settings.HotkeyKeyCode);
+
+                if (!registered)
+                {
+                    // Log or show warning if registration fails (key already in use)
+                    System.Diagnostics.Debug.WriteLine($"Failed to register global hotkey with modifiers {modifiers} and key {_settings.HotkeyKeyCode}");
+                }
+            }
+
+            // Register toggle hot corners hotkey if enabled
+            if (_settings.ToggleHotkeyEnabled)
+            {
+                // Build modifier flags
+                uint modifiers = 0;
+                if (_settings.ToggleHotkeyCtrl) modifiers |= NativeMethods.MOD_CONTROL;
+                if (_settings.ToggleHotkeyAlt) modifiers |= NativeMethods.MOD_ALT;
+                if (_settings.ToggleHotkeyShift) modifiers |= NativeMethods.MOD_SHIFT;
+                if (_settings.ToggleHotkeyWin) modifiers |= NativeMethods.MOD_WIN;
+
+                // Register Ctrl+Alt+H to toggle hot corners
+                bool registered = NativeMethods.RegisterHotKey(
+                    Handle,
+                    HOTKEY_ID_TOGGLE,
+                    modifiers,
+                    (uint)_settings.ToggleHotkeyKeyCode);
+
+                if (!registered)
+                {
+                    // Log or show warning if registration fails (key already in use)
+                    System.Diagnostics.Debug.WriteLine($"Failed to register toggle hotkey with modifiers {modifiers} and key {_settings.ToggleHotkeyKeyCode}");
+                }
             }
         }
 
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == NativeMethods.WM_HOTKEY && m.WParam.ToInt32() == HOTKEY_ID)
+            if (m.Msg == NativeMethods.WM_HOTKEY)
             {
-                // Ctrl+Alt+D was pressed
-                ToggleDesktopIconsFromTray();
+                int hotkeyId = m.WParam.ToInt32();
+                
+                if (hotkeyId == HOTKEY_ID)
+                {
+                    // Ctrl+Alt+D was pressed - toggle desktop icons
+                    ToggleDesktopIconsFromTray();
+                }
+                else if (hotkeyId == HOTKEY_ID_TOGGLE)
+                {
+                    // Toggle hotkey was pressed - toggle hot corners
+                    _settings.Enabled = !_settings.Enabled;
+                    SettingsService.Save(_settings);
+                    _hotCornerManager.UpdateSettings(_settings);
+                    
+                    // Update tray menu checkbox
+                    if (_trayMenu != null)
+                    {
+                        foreach (ToolStripItem item in _trayMenu.Items)
+                        {
+                            if (item is ToolStripMenuItem menuItem && menuItem.Text == "Enable hot corners")
+                            {
+                                menuItem.Checked = _settings.Enabled;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
 
             base.WndProc(ref m);
@@ -300,8 +385,9 @@ namespace WinXCornersDotNet
             _doubleClickMonitor?.Stop();
             _doubleClickMonitor?.Dispose();
             
-            // Unregister the global hotkey
+            // Unregister the global hotkeys
             NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID);
+            NativeMethods.UnregisterHotKey(Handle, HOTKEY_ID_TOGGLE);
             
             _notifyIcon.Visible = false;
             _notifyIcon.Dispose();
@@ -411,6 +497,14 @@ namespace WinXCornersDotNet
             chkHotkeyWin.Checked = _settings.HotkeyWin;
             SetHotkeyKeySelection(_settings.HotkeyKeyCode);
 
+            // Toggle hotkey settings
+            chkToggleHotkeyEnabled.Checked = _settings.ToggleHotkeyEnabled;
+            chkToggleHotkeyCtrl.Checked = _settings.ToggleHotkeyCtrl;
+            chkToggleHotkeyAlt.Checked = _settings.ToggleHotkeyAlt;
+            chkToggleHotkeyShift.Checked = _settings.ToggleHotkeyShift;
+            chkToggleHotkeyWin.Checked = _settings.ToggleHotkeyWin;
+            SetToggleHotkeyKeySelection(_settings.ToggleHotkeyKeyCode);
+
             UpdateCustomControlsEnabled();
         }
 
@@ -431,6 +525,25 @@ namespace WinXCornersDotNet
 
             if (comboHotkeyKey.Items.Count > 0)
                 comboHotkeyKey.SelectedIndex = 0;
+        }
+
+        private void SetToggleHotkeyKeySelection(int keyCode)
+        {
+            for (int i = 0; i < comboToggleHotkeyKey.Items.Count; i++)
+            {
+                var item = comboToggleHotkeyKey.Items[i];
+                if (item == null) continue;
+                
+                var valueProp = item.GetType().GetProperty("Value");
+                if (valueProp != null && (int)valueProp.GetValue(item)! == keyCode)
+                {
+                    comboToggleHotkeyKey.SelectedIndex = i;
+                    return;
+                }
+            }
+
+            if (comboToggleHotkeyKey.Items.Count > 0)
+                comboToggleHotkeyKey.SelectedIndex = 0;
         }
 
         private static decimal ClampNumeric(NumericUpDown control, int value)
@@ -507,6 +620,22 @@ namespace WinXCornersDotNet
                 if (valueProp != null)
                 {
                     _settings.HotkeyKeyCode = (int)valueProp.GetValue(comboHotkeyKey.SelectedItem)!;
+                }
+            }
+
+            // Toggle hotkey settings
+            _settings.ToggleHotkeyEnabled = chkToggleHotkeyEnabled.Checked;
+            _settings.ToggleHotkeyCtrl = chkToggleHotkeyCtrl.Checked;
+            _settings.ToggleHotkeyAlt = chkToggleHotkeyAlt.Checked;
+            _settings.ToggleHotkeyShift = chkToggleHotkeyShift.Checked;
+            _settings.ToggleHotkeyWin = chkToggleHotkeyWin.Checked;
+
+            if (comboToggleHotkeyKey.SelectedItem != null)
+            {
+                var valueProp = comboToggleHotkeyKey.SelectedItem.GetType().GetProperty("Value");
+                if (valueProp != null)
+                {
+                    _settings.ToggleHotkeyKeyCode = (int)valueProp.GetValue(comboToggleHotkeyKey.SelectedItem)!;
                 }
             }
         }

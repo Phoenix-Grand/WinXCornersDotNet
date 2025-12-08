@@ -33,6 +33,14 @@ namespace WinXCornersDotNet
         public bool HotkeyWin { get; set; } = false;
         public int HotkeyKeyCode { get; set; } = 68; // D key
 
+        // Toggle hot corners hotkey settings (default: Ctrl+Alt+H)
+        public bool ToggleHotkeyEnabled { get; set; } = true;
+        public bool ToggleHotkeyCtrl { get; set; } = true;
+        public bool ToggleHotkeyAlt { get; set; } = true;
+        public bool ToggleHotkeyShift { get; set; } = false;
+        public bool ToggleHotkeyWin { get; set; } = false;
+        public int ToggleHotkeyKeyCode { get; set; } = 72; // H key
+
         // Desktop double-click toggle
         // NOTE: Currently disabled due to Windows hook compatibility issues in .NET
         // Use the hotkey (Ctrl+Alt+D) or tray menu instead

@@ -69,6 +69,18 @@ namespace WinXCornersDotNet
         private CheckBox chkHotkeyWin;
         private ComboBox comboHotkeyKey;
 
+        // Toggle hot corners hotkey controls
+        private Label labelToggleHotkey;
+        private CheckBox chkToggleHotkeyEnabled;
+        private CheckBox chkToggleHotkeyCtrl;
+        private CheckBox chkToggleHotkeyAlt;
+        private CheckBox chkToggleHotkeyShift;
+        private CheckBox chkToggleHotkeyWin;
+        private ComboBox comboToggleHotkeyKey;
+
+        // Version label
+        private Label labelVersion;
+
         // Double-click toggle
         private CheckBox chkDoubleClickToggle;
 
@@ -149,6 +161,17 @@ namespace WinXCornersDotNet
             chkHotkeyShift = new CheckBox();
             chkHotkeyWin = new CheckBox();
             comboHotkeyKey = new ComboBox();
+
+            // Toggle hotkey controls
+            labelToggleHotkey = new Label();
+            chkToggleHotkeyEnabled = new CheckBox();
+            chkToggleHotkeyCtrl = new CheckBox();
+            chkToggleHotkeyAlt = new CheckBox();
+            chkToggleHotkeyShift = new CheckBox();
+            chkToggleHotkeyWin = new CheckBox();
+            comboToggleHotkeyKey = new ComboBox();
+
+            labelVersion = new Label();
 
             chkDoubleClickToggle = new CheckBox();
 
@@ -442,6 +465,63 @@ namespace WinXCornersDotNet
             comboHotkeyKey.Size = new Size(100, 23);
             comboHotkeyKey.DropDownHeight = 200;
 
+            // Toggle hot corners hotkey configuration
+            labelToggleHotkey.AutoSize = true;
+            labelToggleHotkey.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            labelToggleHotkey.Location = new Point(12, 358);
+            labelToggleHotkey.Name = "labelToggleHotkey";
+            labelToggleHotkey.Size = new Size(220, 15);
+            labelToggleHotkey.Text = "Global Hotkey (Toggle Hot Corners):";
+
+            chkToggleHotkeyEnabled.AutoSize = true;
+            chkToggleHotkeyEnabled.Checked = true;
+            chkToggleHotkeyEnabled.Location = new Point(12, 381);
+            chkToggleHotkeyEnabled.Name = "chkToggleHotkeyEnabled";
+            chkToggleHotkeyEnabled.Size = new Size(118, 19);
+            chkToggleHotkeyEnabled.Text = "Enable hotkey";
+            chkToggleHotkeyEnabled.UseVisualStyleBackColor = true;
+
+            chkToggleHotkeyCtrl.AutoSize = true;
+            chkToggleHotkeyCtrl.Location = new Point(150, 381);
+            chkToggleHotkeyCtrl.Name = "chkToggleHotkeyCtrl";
+            chkToggleHotkeyCtrl.Size = new Size(45, 19);
+            chkToggleHotkeyCtrl.Text = "Ctrl";
+            chkToggleHotkeyCtrl.UseVisualStyleBackColor = true;
+
+            chkToggleHotkeyAlt.AutoSize = true;
+            chkToggleHotkeyAlt.Location = new Point(205, 381);
+            chkToggleHotkeyAlt.Name = "chkToggleHotkeyAlt";
+            chkToggleHotkeyAlt.Size = new Size(41, 19);
+            chkToggleHotkeyAlt.Text = "Alt";
+            chkToggleHotkeyAlt.UseVisualStyleBackColor = true;
+
+            chkToggleHotkeyShift.AutoSize = true;
+            chkToggleHotkeyShift.Location = new Point(255, 381);
+            chkToggleHotkeyShift.Name = "chkToggleHotkeyShift";
+            chkToggleHotkeyShift.Size = new Size(51, 19);
+            chkToggleHotkeyShift.Text = "Shift";
+            chkToggleHotkeyShift.UseVisualStyleBackColor = true;
+
+            chkToggleHotkeyWin.AutoSize = true;
+            chkToggleHotkeyWin.Location = new Point(315, 381);
+            chkToggleHotkeyWin.Name = "chkToggleHotkeyWin";
+            chkToggleHotkeyWin.Size = new Size(47, 19);
+            chkToggleHotkeyWin.Text = "Win";
+            chkToggleHotkeyWin.UseVisualStyleBackColor = true;
+
+            comboToggleHotkeyKey.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboToggleHotkeyKey.Location = new Point(375, 379);
+            comboToggleHotkeyKey.Name = "comboToggleHotkeyKey";
+            comboToggleHotkeyKey.Size = new Size(100, 23);
+            comboToggleHotkeyKey.DropDownHeight = 200;
+
+            // Version label
+            labelVersion.AutoSize = true;
+            labelVersion.Location = new Point(12, 455);
+            labelVersion.Name = "labelVersion";
+            labelVersion.Size = new Size(80, 15);
+            labelVersion.Text = "Version 1.3.2";
+
             // Double-click toggle
             chkDoubleClickToggle.AutoSize = true;
             chkDoubleClickToggle.Checked = true;
@@ -452,19 +532,19 @@ namespace WinXCornersDotNet
             chkDoubleClickToggle.UseVisualStyleBackColor = true;
 
             // Buttons (moved down to avoid overlap with hotkey controls)
-            btnApply.Location = new Point(390, 360);
+            btnApply.Location = new Point(390, 420);
             btnApply.Name = "btnApply";
             btnApply.Size = new Size(90, 27);
             btnApply.Text = "Apply";
             btnApply.UseVisualStyleBackColor = true;
 
-            btnSave.Location = new Point(490, 360);
+            btnSave.Location = new Point(490, 420);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(100, 27);
             btnSave.Text = "Save && Hide";
             btnSave.UseVisualStyleBackColor = true;
 
-            btnCancel.Location = new Point(600, 360);
+            btnCancel.Location = new Point(600, 420);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new Size(90, 27);
             btnCancel.Text = "Cancel";
@@ -473,7 +553,7 @@ namespace WinXCornersDotNet
             // MainForm
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 400);  // Increased width for delay column
+            ClientSize = new Size(800, 480);  // Increased width for delay column, height for toggle hotkey
             Controls.Add(labelTitle);
             Controls.Add(labelHeaderCorner);
             Controls.Add(labelHeaderAction);
@@ -528,6 +608,16 @@ namespace WinXCornersDotNet
             Controls.Add(chkHotkeyWin);
             Controls.Add(comboHotkeyKey);
 
+            Controls.Add(labelToggleHotkey);
+            Controls.Add(chkToggleHotkeyEnabled);
+            Controls.Add(chkToggleHotkeyCtrl);
+            Controls.Add(chkToggleHotkeyAlt);
+            Controls.Add(chkToggleHotkeyShift);
+            Controls.Add(chkToggleHotkeyWin);
+            Controls.Add(comboToggleHotkeyKey);
+
+            Controls.Add(labelVersion);
+
             Controls.Add(btnApply);
             Controls.Add(btnSave);
             Controls.Add(btnCancel);
@@ -538,7 +628,7 @@ namespace WinXCornersDotNet
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "WinXCorners.NET";
-            ClientSize = new Size(800, 400);  // Increased width for delay column
+            ClientSize = new Size(800, 480);  // Increased width for delay column, height for toggle hotkey
 
             ((System.ComponentModel.ISupportInitialize)numDelay).EndInit();
             ((System.ComponentModel.ISupportInitialize)numCornerSize).EndInit();
