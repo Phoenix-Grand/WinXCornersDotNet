@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 
 namespace WinXCornersDotNet
@@ -106,7 +107,7 @@ namespace WinXCornersDotNet
             else if (delayMs > 0)
             {
                 // Show countdown if there is a delay
-                _countdownForm.ShowAt(pt, _currentCorner);
+                _countdownForm.ShowAt(new Point(pt.X, pt.Y), _currentCorner);
                 _countdownForm.UpdateProgress(remaining);
             }
         }
