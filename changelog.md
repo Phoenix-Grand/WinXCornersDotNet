@@ -8,6 +8,10 @@
 ### Known Limitations
 - **Double-click toggle disabled**: The desktop double-click to toggle icons feature has compatibility issues with Windows hooks in .NET applications. Use the hotkey (default: Ctrl+Alt+D) or system tray menu instead.
 
+### 1.3.4
+- Added support for hiding corner countdowns per corner
+- Added "Show Timer" checkbox for each corner in settings
+
 ### 1.3.3
 - Added visual countdown timer when hovering over a hot corner
 

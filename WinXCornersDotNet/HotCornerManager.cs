@@ -106,9 +106,12 @@ namespace WinXCornersDotNet
             }
             else if (delayMs > 0)
             {
-                // Show countdown if there is a delay
-                _countdownForm.ShowAt(new Point(pt.X, pt.Y), _currentCorner);
-                _countdownForm.UpdateProgress(remaining);
+                // Show countdown if there is a delay AND it's enabled for this corner
+                if (GetShowCountdownForCorner(_currentCorner))
+                {
+                    _countdownForm.ShowAt(new Point(pt.X, pt.Y), _currentCorner);
+                    _countdownForm.UpdateProgress(remaining);
+                }
             }
         }
 
@@ -120,6 +123,16 @@ namespace WinXCornersDotNet
                 HotCorner.BottomLeft => _settings.BottomLeft.DelayMs,
                 HotCorner.BottomRight => _settings.BottomRight.DelayMs,
                 _ => _settings.GlobalDelayMs
+            };
+
+        private bool GetShowCountdownForCorner(HotCorner corner) =>
+            corner switch
+            {
+                HotCorner.TopLeft => _settings.TopLeft.ShowCountdown,
+                HotCorner.TopRight => _settings.TopRight.ShowCountdown,
+                HotCorner.BottomLeft => _settings.BottomLeft.ShowCountdown,
+                HotCorner.BottomRight => _settings.BottomRight.ShowCountdown,
+                _ => true
             };
 
         public void Dispose()

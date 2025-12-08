@@ -10,6 +10,8 @@ namespace WinXCornersDotNet
         /// Per-corner delay in milliseconds. 0 = use global delay.
         /// </summary>
         public int DelayMs { get; set; } = 0;
+
+        public bool ShowCountdown { get; set; } = true;
     }
 
     public class AppSettings

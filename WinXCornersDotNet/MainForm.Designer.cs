@@ -15,7 +15,10 @@ namespace WinXCornersDotNet
         private Label labelHeaderAction;
         private Label labelHeaderCommand;
         private Label labelHeaderArgs;
+        private Label labelHeaderCommand;
+        private Label labelHeaderArgs;
         private Label labelHeaderDelay;
+        private Label labelHeaderCountdown;
 
         private Label labelTopLeft;
         private ComboBox comboTopLeft;
@@ -45,7 +48,14 @@ namespace WinXCornersDotNet
         private NumericUpDown numTopLeftDelay;
         private NumericUpDown numTopRightDelay;
         private NumericUpDown numBottomLeftDelay;
+        private NumericUpDown numBottomLeftDelay;
         private NumericUpDown numBottomRightDelay;
+
+        // Per-corner countdown checkboxes
+        private CheckBox chkTopLeftCountdown;
+        private CheckBox chkTopRightCountdown;
+        private CheckBox chkBottomLeftCountdown;
+        private CheckBox chkBottomRightCountdown;
 
         private Label labelDelay;
         private NumericUpDown numDelay;
@@ -108,7 +118,10 @@ namespace WinXCornersDotNet
             labelHeaderAction = new Label();
             labelHeaderCommand = new Label();
             labelHeaderArgs = new Label();
+            labelHeaderCommand = new Label();
+            labelHeaderArgs = new Label();
             labelHeaderDelay = new Label();
+            labelHeaderCountdown = new Label();
 
             labelTopLeft = new Label();
             comboTopLeft = new ComboBox();
@@ -138,7 +151,14 @@ namespace WinXCornersDotNet
             numTopLeftDelay = new NumericUpDown();
             numTopRightDelay = new NumericUpDown();
             numBottomLeftDelay = new NumericUpDown();
+            numBottomLeftDelay = new NumericUpDown();
             numBottomRightDelay = new NumericUpDown();
+
+            // Per-corner countdown checkboxes
+            chkTopLeftCountdown = new CheckBox();
+            chkTopRightCountdown = new CheckBox();
+            chkBottomLeftCountdown = new CheckBox();
+            chkBottomRightCountdown = new CheckBox();
 
             labelDelay = new Label();
             numDelay = new NumericUpDown();
@@ -222,6 +242,12 @@ namespace WinXCornersDotNet
             labelHeaderDelay.Size = new Size(100, 15);
             labelHeaderDelay.Text = "Delay (ms, 0=default)";
 
+            labelHeaderCountdown.AutoSize = true;
+            labelHeaderCountdown.Location = new Point(790, 40);
+            labelHeaderCountdown.Name = "labelHeaderCountdown";
+            labelHeaderCountdown.Size = new Size(70, 15);
+            labelHeaderCountdown.Text = "Show Timer";
+
             int row1Y = 65;
             int rowSpacing = 35;
 
@@ -258,6 +284,13 @@ namespace WinXCornersDotNet
             numTopLeftDelay.Minimum = 0;
             numTopLeftDelay.Value = 0;
 
+            chkTopLeftCountdown.AutoSize = true;
+            chkTopLeftCountdown.Location = new Point(790, row1Y);
+            chkTopLeftCountdown.Name = "chkTopLeftCountdown";
+            chkTopLeftCountdown.Size = new Size(15, 14);
+            chkTopLeftCountdown.UseVisualStyleBackColor = true;
+            chkTopLeftCountdown.Checked = true;
+
             // Top Right row
             int row2Y = row1Y + rowSpacing;
 
@@ -292,6 +325,13 @@ namespace WinXCornersDotNet
             numTopRightDelay.Maximum = 5000;
             numTopRightDelay.Minimum = 0;
             numTopRightDelay.Value = 0;
+
+            chkTopRightCountdown.AutoSize = true;
+            chkTopRightCountdown.Location = new Point(790, row2Y);
+            chkTopRightCountdown.Name = "chkTopRightCountdown";
+            chkTopRightCountdown.Size = new Size(15, 14);
+            chkTopRightCountdown.UseVisualStyleBackColor = true;
+            chkTopRightCountdown.Checked = true;
 
             // Bottom Left row
             int row3Y = row2Y + rowSpacing;
@@ -328,6 +368,13 @@ namespace WinXCornersDotNet
             numBottomLeftDelay.Minimum = 0;
             numBottomLeftDelay.Value = 0;
 
+            chkBottomLeftCountdown.AutoSize = true;
+            chkBottomLeftCountdown.Location = new Point(790, row3Y);
+            chkBottomLeftCountdown.Name = "chkBottomLeftCountdown";
+            chkBottomLeftCountdown.Size = new Size(15, 14);
+            chkBottomLeftCountdown.UseVisualStyleBackColor = true;
+            chkBottomLeftCountdown.Checked = true;
+
             // Bottom Right row
             int row4Y = row3Y + rowSpacing;
 
@@ -362,6 +409,13 @@ namespace WinXCornersDotNet
             numBottomRightDelay.Maximum = 5000;
             numBottomRightDelay.Minimum = 0;
             numBottomRightDelay.Value = 0;
+
+            chkBottomRightCountdown.AutoSize = true;
+            chkBottomRightCountdown.Location = new Point(790, row4Y);
+            chkBottomRightCountdown.Name = "chkBottomRightCountdown";
+            chkBottomRightCountdown.Size = new Size(15, 14);
+            chkBottomRightCountdown.UseVisualStyleBackColor = true;
+            chkBottomRightCountdown.Checked = true;
 
             // Delay
             labelDelay.AutoSize = true;
@@ -520,7 +574,7 @@ namespace WinXCornersDotNet
             labelVersion.Location = new Point(12, 455);
             labelVersion.Name = "labelVersion";
             labelVersion.Size = new Size(80, 15);
-            labelVersion.Text = "Version 1.3.3";
+            labelVersion.Text = "Version 1.3.4";
 
             // Double-click toggle
             chkDoubleClickToggle.AutoSize = true;
@@ -553,14 +607,19 @@ namespace WinXCornersDotNet
             // MainForm
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 480);  // Increased width for delay column, height for toggle hotkey
+            ClientSize = new Size(900, 480);
             Controls.Add(labelTitle);
             Controls.Add(labelHeaderCorner);
             Controls.Add(labelHeaderAction);
             Controls.Add(labelHeaderCommand);
             Controls.Add(labelHeaderArgs);
             Controls.Add(labelHeaderDelay);
-
+            Controls.Add(labelHeaderCountdown);
+            Controls.Add(labelTitle);
+            Controls.Add(chkTopLeftCountdown);
+            Controls.Add(chkTopRightCountdown);
+            Controls.Add(chkBottomLeftCountdown);
+            Controls.Add(chkBottomRightCountdown);
             Controls.Add(labelTopLeft);
             Controls.Add(comboTopLeft);
             Controls.Add(txtTopLeftCommand);
