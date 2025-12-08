@@ -14,6 +14,8 @@ namespace WinXCornersDotNet
         private DateTime _enteredAt = DateTime.MinValue;
         private bool _triggered;
         private bool _disposed;
+        
+        private readonly CountdownForm _countdownForm;
 
         public HotCornerManager(AppSettings settings, Action<HotCorner> onCornerTriggered)
         {
@@ -25,6 +27,8 @@ namespace WinXCornersDotNet
                 Interval = 30 // ~33 Hz polling
             };
             _timer.Tick += TimerOnTick;
+            
+            _countdownForm = new CountdownForm();
         }
 
         public void UpdateSettings(AppSettings settings)
@@ -72,6 +76,12 @@ namespace WinXCornersDotNet
                 _currentCorner = newCorner;
                 _enteredAt = DateTime.Now;
                 _triggered = false;
+                
+                // Hide countdown if we switched corners or left a corner
+                if (_currentCorner == HotCorner.None)
+                {
+                    _countdownForm.Hide();
+                }
             }
 
             if (_currentCorner == HotCorner.None || _triggered)
@@ -85,10 +95,19 @@ namespace WinXCornersDotNet
                 delayMs = 0;
 
             var elapsed = (DateTime.Now - _enteredAt).TotalMilliseconds;
+            double remaining = delayMs - elapsed;
+
             if (elapsed >= delayMs)
             {
                 _triggered = true;
+                _countdownForm.Hide();
                 _onCornerTriggered(_currentCorner);
+            }
+            else if (delayMs > 0)
+            {
+                // Show countdown if there is a delay
+                _countdownForm.ShowAt(pt, _currentCorner);
+                _countdownForm.UpdateProgress(remaining);
             }
         }
 
@@ -107,6 +126,7 @@ namespace WinXCornersDotNet
             if (_disposed) return;
             _disposed = true;
             _timer.Dispose();
+            _countdownForm.Dispose();
         }
     }
 }

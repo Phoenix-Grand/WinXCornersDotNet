@@ -520,7 +520,7 @@ namespace WinXCornersDotNet
             labelVersion.Location = new Point(12, 455);
             labelVersion.Name = "labelVersion";
             labelVersion.Size = new Size(80, 15);
-            labelVersion.Text = "Version 1.3.2";
+            labelVersion.Text = "Version 1.3.3";
 
             // Double-click toggle
             chkDoubleClickToggle.AutoSize = true;

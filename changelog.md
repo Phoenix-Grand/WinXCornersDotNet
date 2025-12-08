@@ -1,14 +1,15 @@
 ## Changelog
 
 ### TODO
-- Add support for individual corner timings
 - Fix double-click on empty desktop space not triggering
 - Add support for corner hotkeys
-- Add countdown timer for corner activation
 - Add double-click system tray to toggle disable/enable desktop show/hide icons
 
 ### Known Limitations
 - **Double-click toggle disabled**: The desktop double-click to toggle icons feature has compatibility issues with Windows hooks in .NET applications. Use the hotkey (default: Ctrl+Alt+D) or system tray menu instead.
+
+### 1.3.3
+- Added visual countdown timer when hovering over a hot corner
 
 ### 1.3.2
 - Added version number display to settings window
