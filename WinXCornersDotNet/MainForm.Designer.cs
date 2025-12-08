@@ -15,8 +15,6 @@ namespace WinXCornersDotNet
         private Label labelHeaderAction;
         private Label labelHeaderCommand;
         private Label labelHeaderArgs;
-        private Label labelHeaderCommand;
-        private Label labelHeaderArgs;
         private Label labelHeaderDelay;
         private Label labelHeaderCountdown;
 
@@ -47,7 +45,6 @@ namespace WinXCornersDotNet
         // Per-corner delay controls
         private NumericUpDown numTopLeftDelay;
         private NumericUpDown numTopRightDelay;
-        private NumericUpDown numBottomLeftDelay;
         private NumericUpDown numBottomLeftDelay;
         private NumericUpDown numBottomRightDelay;
 
@@ -118,8 +115,6 @@ namespace WinXCornersDotNet
             labelHeaderAction = new Label();
             labelHeaderCommand = new Label();
             labelHeaderArgs = new Label();
-            labelHeaderCommand = new Label();
-            labelHeaderArgs = new Label();
             labelHeaderDelay = new Label();
             labelHeaderCountdown = new Label();
 
@@ -150,7 +145,6 @@ namespace WinXCornersDotNet
             // Per-corner delays
             numTopLeftDelay = new NumericUpDown();
             numTopRightDelay = new NumericUpDown();
-            numBottomLeftDelay = new NumericUpDown();
             numBottomLeftDelay = new NumericUpDown();
             numBottomRightDelay = new NumericUpDown();
 
